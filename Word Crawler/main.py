@@ -48,8 +48,8 @@ class GoogleSearchCrawler:
             print(f"No results found for '{self.search_term}'.")
 
 if __name__ == "__main__":
-    api_key = "AIzaSyC-zwSnNzttyfIuDN7O825ovOgY0L8iXKI"
-    cse_id = "80e65eac15a724f7c"
+    api_key = "API KEY"
+    cse_id = "CSE ID"
     search_term = input("Enter the keyword or subject to search for: ")
     max_results = int(input("Enter the number of results to retrieve (e.g., 10): "))
 
