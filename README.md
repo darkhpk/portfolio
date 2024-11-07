@@ -36,6 +36,9 @@ A GUI Game in Python that will display an image and you have to insert the corre
 ### 📂 [Image Downloading Bot](https://github.com/darkhpk/portfolio/tree/42f7744b8424becfb1ff42fab8918b27ed10a17f/imgBot)
 A program that after you enter an URL it will download all the images present there!
 
+### 📂 [More Projects](https://darkhpk.github.io/portfolio/)
+More small scripts, app and programs
+
 ## 📚 Additional Projects
 - **Anime Streaming Website** - Django-based platform for streaming anime.
 - **Password Management App** - Currently in the concept phase, focusing on security and user experience.
