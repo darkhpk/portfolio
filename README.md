@@ -35,7 +35,7 @@ A GUI Game in Python that will display an image and you have to insert the corre
 A program that after you enter an URL it will download all the images present there!
 
 ## 📚 Additional Projects
-- **Tourism Booking web server** - Django-based platform for streaming anime.
+- **Tourism Booking web server** - Django-based platform for booking trips or hotel rooms with the possibility to add eco review. At the moment is hosted on a vps at this URL: [http://](http://87.106.96.193/)
 
 ## 📫 Get In Touch
 - **Email:** pogar.cristi@yahoo.ro
