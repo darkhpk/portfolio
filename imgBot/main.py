@@ -1,5 +1,7 @@
 import os
 import requests
+import argparse
+import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -8,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from urllib.parse import urljoin, urlparse
+from concurrent.futures import ThreadPoolExecutor
 
 def download_image(image_url, folder):
     try:
@@ -24,7 +27,7 @@ def download_image(image_url, folder):
             for chunk in response.iter_content(1024):
                 file.write(chunk)
 
-        print(f"Downloaded {image_url} to {file_path}")
+        print(f"Downloaded {file_path}")
     except requests.RequestException as e:
         print(f"Failed to download {image_url}: {e}")
 
@@ -83,12 +86,45 @@ def download_all_images(url, output_folder):
                 download_image(img_url, output_folder)
 
 def chapters(url, title, nr_img):
+    print("Start iterable download")
+    time.sleep(1)
     for i in range(1,nr_img):
         url_all = f"{url}/chapter-{i}"
-        output_folder = f"downloaded_images\{title}\chapter-{i}"
+        output_folder = f"downloaded_images/{title}/chapter-{i}"
         download_all_images(url_all, output_folder)
 
-url = input("Enter the URL of the webpage: ")
-title = url.split("/")[-2]
-print(title)
-chapters(url, title, 378)
+def th_chapter(url, title, nr_img):
+    print(f"Starting download on chapter-{nr_img}")
+    time.sleep(1)
+    url_img = f"{url}/chapter-{nr_img}"
+    output_folder = f"downloaded_images/{title}/chapter-{nr_img}"
+    download_all_images(url_img, output_folder)
+    print(f"Done download on chapter-{nr_img}")
+
+def multi_thread(url, title, nr_img):
+    print("Start threaded function..")
+    time.sleep(1)
+    list_chapter = []
+    for i in range(1, nr_img+1):
+        list_chapter.append(i)
+    with ThreadPoolExecutor() as executor:
+        executor.map(th_chapter, [url]*nr_img, [title]*nr_img, list_chapter)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        prog="Image Downloader",
+        description="Help Download mangas from websites with simple URL examples: https://domain.com/title/chapter-[nr]"
+    )
+    parser.add_argument("url")
+    parser.add_argument("-n", "--number", help="Add number of chapter the manga has!")
+    parser.add_argument("-t", "--thread", action="store_true", help="Turn multithreading on or off")
+    args = parser.parse_args()
+    url = args.url
+    ch_nr = args.number
+    title = url.split("/")[-2]
+    if args.thread == True:
+        multi_thread(url, title, int(ch_nr))
+    else:
+        chapters(url, title, ch_nr)
+    print(title, ch_nr)
+    
