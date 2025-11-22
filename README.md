@@ -2,17 +2,15 @@ Welcome to my GitHub portfolio! I'm passionate about technology and always eager
 
 ## 🚀 About Me
 - 🌌 Mythology Enthusiast
-- 🎮 Game Developer (Current Project: **Relativity Load Creator and Pre Discovery Document Processor**)
 - 🔍 Aspiring Penetration Tester
 - 📊 Data Scientist with a background in statistics
 - 💻 Python Expert (also comfortable with C++ and C#)
-- 🏦 Interested in creating a **Game** and an **Image Processing Program**
+- 🏦 Interested in creating a **Game**
 
 ## 🛠️ Technical Skills
-- **Languages:** Python, C++, C#
-- **Frameworks & Tools:** Django, PyQt6, Kivy
+- **Languages:** Python, C++, C#, Dart, HTML/CSS/PHP, BootStrap/JQuery
+- **Frameworks & Tools:** Django, PyQt6, Flutter
 - **Specialized Areas:**
-  - Game Development
   - Data Science (LSTM for stock prediction)
   - Cybersecurity
   - Web Development
@@ -37,9 +35,7 @@ A GUI Game in Python that will display an image and you have to insert the corre
 A program that after you enter an URL it will download all the images present there!
 
 ## 📚 Additional Projects
-- **Anime Streaming Website** - Django-based platform for streaming anime.
-- **Password Management App** - Currently in the concept phase, focusing on security and user experience.
-- **CSV an Item_Proto Viewer and Editor** - A program that helps with viewing and editing the Item_Proto for the server of Metin2 Game or a CSV file.
+- **Tourism Booking web server** - Django-based platform for streaming anime.
 
 ## 📫 Get In Touch
 - **Email:** pogar.cristi@yahoo.ro
