@@ -1,0 +1,6 @@
+FileName,Author,DateCreated,Subject,DocType,Custodian,Confidential
+document001.pdf,John Doe,2024-01-15,Q1 Sales Report,Report,Sales Dept,No
+document002.pdf,Jane Smith,2024-01-16,Client Meeting Notes,Email,Legal,Yes
+document003.pdf,Bob Johnson,2024-01-17,Product Specifications,Technical,Engineering,No
+document004.pdf,Alice Williams,2024-01-18,Marketing Strategy,Presentation,Marketing,Yes
+document005.pdf,Charlie Brown,2024-01-19,Budget Proposal,Financial,Finance,No

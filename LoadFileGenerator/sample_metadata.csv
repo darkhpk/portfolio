@@ -1,0 +1,48 @@
+# Load File Generator - Sample Metadata CSV
+
+This is a sample CSV file showing the expected format for document metadata.
+
+## CSV Format
+
+The CSV file should have:
+- First row: Column headers
+- Subsequent rows: Metadata for each document
+- Optional: "FileName" column to match with PDF files
+
+## Sample Data
+
+```csv
+FileName,Author,DateCreated,Subject,DocType,Custodian,Confidential
+document001.pdf,John Doe,2024-01-15,Q1 Sales Report,Report,Sales Dept,No
+document002.pdf,Jane Smith,2024-01-16,Client Meeting Notes,Email,Legal,Yes
+document003.pdf,Bob Johnson,2024-01-17,Product Specifications,Technical,Engineering,No
+document004.pdf,Alice Williams,2024-01-18,Marketing Strategy,Presentation,Marketing,Yes
+document005.pdf,Charlie Brown,2024-01-19,Budget Proposal,Financial,Finance,No
+```
+
+## Field Descriptions
+
+- **FileName**: Name of the PDF file (used for matching)
+- **Author**: Document creator
+- **DateCreated**: Creation date (YYYY-MM-DD format recommended)
+- **Subject**: Document subject or description
+- **DocType**: Type of document (Email, Report, Contract, etc.)
+- **Custodian**: Document owner or department
+- **Confidential**: Confidentiality status (Yes/No)
+
+## Notes
+
+1. You can add any custom fields you need
+2. All fields will appear in the generated DAT file
+3. If FileName column is missing, metadata will be assigned in order
+4. Use proper CSV escaping for fields with commas or quotes
+5. UTF-8 encoding is recommended
+
+## Creating Your CSV
+
+You can create the CSV file using:
+- Microsoft Excel (Save As → CSV UTF-8)
+- Google Sheets (File → Download → CSV)
+- Any text editor
+
+Save the file with `.csv` extension.
