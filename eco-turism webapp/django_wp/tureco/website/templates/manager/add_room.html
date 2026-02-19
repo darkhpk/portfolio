@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Room - {{ hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="fa-solid fa-bed me-2"></i>Add Room to {{ hotel.name }}
+          </h4>
+        </div>
+        <div class="card-body">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+
+            <div class="mb-3">
+              <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+              {{ form.name }}
+              {% if form.name.errors %}
+                <div class="invalid-feedback d-block">{{ form.name.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.max_persons.id_for_label }}" class="form-label">{{ form.max_persons.label }}</label>
+                {{ form.max_persons }}
+                {% if form.max_persons.errors %}
+                  <div class="invalid-feedback d-block">{{ form.max_persons.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.price_per_night.id_for_label }}" class="form-label">{{ form.price_per_night.label }}</label>
+                {{ form.price_per_night }}
+                {% if form.price_per_night.errors %}
+                  <div class="invalid-feedback d-block">{{ form.price_per_night.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.total_rooms.id_for_label }}" class="form-label">{{ form.total_rooms.label }}</label>
+                {{ form.total_rooms }}
+                {% if form.total_rooms.errors %}
+                  <div class="invalid-feedback d-block">{{ form.total_rooms.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-save me-2"></i>Save Room Type
+              </button>
+              <a href="{% url 'website:manager_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-times me-2"></i>Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home — Tur'Eco | Sustainable Travel Platform{% endblock %}
+
+{% block content %}
+<!-- 🌍 Hero Section -->
+<section class="hero-section position-relative overflow-hidden">
+  <div class="hero-overlay"></div>
+  <div class="container position-relative" style="z-index: 2;">
+    <div class="row min-vh-75 align-items-center text-center text-white py-5">
+      <div class="col-lg-8 mx-auto">
+        <h1 class="display-3 fw-bold mb-4 hero-title">
+          Travel Green, Live Clean
+        </h1>
+        <p class="lead fs-4 mb-5">
+          Discover eco-friendly hotels and sustainable transportation for your next adventure
+        </p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+          <a href="{% url 'website:search' %}" class="btn btn-success btn-lg px-5 shadow">
+            <i class="fa-solid fa-magnifying-glass me-2"></i>Start Your Journey
+          </a>
+          <a href="#features" class="btn btn-outline-light btn-lg px-5">
+            <i class="fa-solid fa-circle-info me-2"></i>Learn More
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 📊 Stats Section -->
+<section class="py-5 bg-success text-white">
+  <div class="container">
+    <div class="row text-center g-4">
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-item">
+          <i class="fa-solid fa-hotel fa-3x mb-3"></i>
+          <h3 class="fw-bold">500+</h3>
+          <p class="mb-0">Eco Hotels</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-item">
+          <i class="fa-solid fa-bus fa-3x mb-3"></i>
+          <h3 class="fw-bold">200+</h3>
+          <p class="mb-0">Green Transport Options</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-item">
+          <i class="fa-solid fa-users fa-3x mb-3"></i>
+          <h3 class="fw-bold">10,000+</h3>
+          <p class="mb-0">Happy Travelers</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-item">
+          <i class="fa-solid fa-leaf fa-3x mb-3"></i>
+          <h3 class="fw-bold">50,000+</h3>
+          <p class="mb-0">Tons CO₂ Saved</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ✨ Features Section -->
+<section id="features" class="py-5">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-bold text-success mb-3">Why Choose Tur'Eco?</h2>
+      <p class="lead text-muted">Your partner in sustainable travel</p>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm h-100 feature-card">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon mb-3">
+              <i class="fa-solid fa-seedling fa-3x text-success"></i>
+            </div>
+            <h4 class="fw-bold mb-3">Eco-Certified Accommodations</h4>
+            <p class="text-muted">Stay in hotels committed to sustainability, renewable energy, and waste reduction practices.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm h-100 feature-card">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon mb-3">
+              <i class="fa-solid fa-train fa-3x text-success"></i>
+            </div>
+            <h4 class="fw-bold mb-3">Green Transportation</h4>
+            <p class="text-muted">Travel with low-emission buses, trains, and electric vehicles that reduce your carbon footprint.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm h-100 feature-card">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon mb-3">
+              <i class="fa-solid fa-dollar-sign fa-3x text-success"></i>
+            </div>
+            <h4 class="fw-bold mb-3">Best Price Guarantee</h4>
+            <p class="text-muted">Competitive pricing on all eco-friendly options without compromising on quality or comfort.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm h-100 feature-card">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon mb-3">
+              <i class="fa-solid fa-shield-halved fa-3x text-success"></i>
+            </div>
+            <h4 class="fw-bold mb-3">Secure Booking</h4>
+            <p class="text-muted">Safe and encrypted transactions with instant confirmation for your peace of mind.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm h-100 feature-card">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon mb-3">
+              <i class="fa-solid fa-star fa-3x text-success"></i>
+            </div>
+            <h4 class="fw-bold mb-3">Verified Reviews</h4>
+            <p class="text-muted">Read authentic reviews from fellow eco-conscious travelers to make informed decisions.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm h-100 feature-card">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon mb-3">
+              <i class="fa-solid fa-headset fa-3x text-success"></i>
+            </div>
+            <h4 class="fw-bold mb-3">24/7 Support</h4>
+            <p class="text-muted">Our dedicated team is always ready to assist you throughout your sustainable journey.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 🌱 How It Works Section -->
+<section class="py-5 bg-light">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <h2 class="display-5 fw-bold text-success mb-3">How It Works</h2>
+      <p class="lead text-muted">Start your eco-friendly journey in three simple steps</p>
+    </div>
+    
+    <div class="row g-4 align-items-center">
+      <div class="col-md-4">
+        <div class="text-center">
+          <div class="step-circle mb-3 mx-auto">
+            <span class="display-4 fw-bold text-white">1</span>
+          </div>
+          <h4 class="fw-bold mb-3">Search</h4>
+          <p class="text-muted px-3">Enter your destination, travel dates, and preferences to find eco-friendly options.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="text-center">
+          <div class="step-circle mb-3 mx-auto">
+            <span class="display-4 fw-bold text-white">2</span>
+          </div>
+          <h4 class="fw-bold mb-3">Compare</h4>
+          <p class="text-muted px-3">Browse sustainable hotels and transportation, read reviews, and compare prices.</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="text-center">
+          <div class="step-circle mb-3 mx-auto">
+            <span class="display-4 fw-bold text-white">3</span>
+          </div>
+          <h4 class="fw-bold mb-3">Book</h4>
+          <p class="text-muted px-3">Secure your reservation and start your sustainable adventure with confidence.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 💚 Environmental Impact Section -->
+<section class="py-5">
+  <div class="container py-4">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <h2 class="display-5 fw-bold text-success mb-4">Make a Difference</h2>
+        <p class="lead mb-4">Every journey with Tur'Eco contributes to a healthier planet.</p>
+        <div class="impact-list">
+          <div class="d-flex align-items-start mb-3">
+            <i class="fa-solid fa-check-circle text-success fa-2x me-3 mt-1"></i>
+            <div>
+              <h5 class="fw-bold mb-2">Reduce Carbon Emissions</h5>
+              <p class="text-muted">Choose low-carbon transportation options and eco-certified hotels.</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-start mb-3">
+            <i class="fa-solid fa-check-circle text-success fa-2x me-3 mt-1"></i>
+            <div>
+              <h5 class="fw-bold mb-2">Support Local Communities</h5>
+              <p class="text-muted">Partner hotels employ local staff and source products locally.</p>
+            </div>
+          </div>
+          <div class="d-flex align-items-start mb-3">
+            <i class="fa-solid fa-check-circle text-success fa-2x me-3 mt-1"></i>
+            <div>
+              <h5 class="fw-bold mb-2">Protect Natural Resources</h5>
+              <p class="text-muted">Stay at properties using renewable energy and water conservation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="card border-success shadow-lg">
+          <div class="card-body p-5 text-center bg-success bg-opacity-10">
+            <i class="fa-solid fa-earth-americas fa-5x text-success mb-4"></i>
+            <h3 class="fw-bold mb-3">Join the Movement</h3>
+            <p class="mb-4">Be part of a growing community of conscious travelers making sustainable choices.</p>
+            <a href="{% url 'customer_signup' %}" class="btn btn-success btn-lg px-5">
+              <i class="fa-solid fa-user-plus me-2"></i>Sign Up Free
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 📢 CTA Section -->
+<section class="py-5 bg-success text-white">
+  <div class="container py-4 text-center">
+    <h2 class="display-5 fw-bold mb-3">Ready to Travel Sustainably?</h2>
+    <p class="lead mb-4">Start exploring eco-friendly destinations today</p>
+    <a href="{% url 'website:search' %}" class="btn btn-light btn-lg px-5 shadow">
+      <i class="fa-solid fa-magnifying-glass me-2"></i>Find Your Next Destination
+    </a>
+  </div>
+</section>
+
+<style>
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #2d7a3e 0%, #1e5128 100%);
+  position: relative;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,144C960,149,1056,139,1152,128C1248,117,1344,107,1392,101.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+  background-size: cover;
+  opacity: 0.3;
+}
+
+.min-vh-75 {
+  min-height: 75vh;
+}
+
+.hero-title {
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stats Section */
+.stat-item {
+  transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-5px);
+}
+
+/* Feature Cards */
+.feature-card {
+  transition: all 0.3s ease;
+  border-radius: 15px;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 1rem 3rem rgba(0,0,0,0.175) !important;
+}
+
+.feature-icon {
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+  transform: scale(1.1);
+}
+
+/* Steps */
+.step-circle {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, #2d7a3e 0%, #1e5128 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(45, 122, 62, 0.3);
+}
+
+/* Impact List */
+.impact-list i {
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .display-5 {
+    font-size: 2rem;
+  }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+      <h1 class="display-1">500</h1>
+      <h2>Server Error</h2>
+      <p class="lead">Something went wrong on our end. We're working to fix it.</p>
+      <a href="{% url 'website:search' %}" class="btn btn-primary">Go to Home</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

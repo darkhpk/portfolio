@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load form_tags %} {# provides add_class filter (see note below) #}
+
+{% block title %}Search — Tur’Eco{% endblock %}
+
+{% block content %}
+<div class="py-4">
+  <div class="card shadow-sm p-4">
+    <h2 class="h4 mb-4 text-bg-color">
+      <i class="fa-solid fa-magnifying-glass me-2"></i>Search
+    </h2>
+
+    <form method="get" action="{% url 'website:results' %}" id="searchForm" class="row g-3">
+      <!-- Search type -->
+      <div class="col-12 col-sm-4">
+        <label class="form-label">Search type</label>
+        {{ form.search_type|add_class:"form-select" }}
+      </div>
+
+      <!-- From (transport only) -->
+      <div class="col-12 col-sm-4 js-transport">
+        <label class="form-label">From</label>
+        {{ form.city_from|add_class:"form-control" }}
+      </div>
+
+      <!-- To / City -->
+      <div class="col-12 col-sm-4">
+        <label class="form-label">To / City</label>
+        {{ form.city_to|add_class:"form-control" }}
+      </div>
+
+      <!-- Persons (hotel only) -->
+      <div class="col-12 col-sm-6 col-md-4 js-hotel">
+        <label class="form-label">Persons</label>
+        {{ form.persons|add_class:"form-control" }}
+      </div>
+
+      <!-- Check-in/Check-out (hotel only) -->
+      <div class="col-12 col-sm-6 col-md-4 js-hotel">
+        <label class="form-label">Check in</label>
+        {{ form.check_in|add_class:"form-control" }}
+      </div>
+      <div class="col-12 col-sm-6 col-md-4 js-hotel">
+        <label class="form-label">Check out</label>
+        {{ form.check_out|add_class:"form-control" }}
+      </div>
+
+      <!-- Departure (transport only) -->
+      <div class="col-12 col-sm-6 col-md-4 js-transport">
+        <label class="form-label">Departure</label>
+        {{ form.departure|add_class:"form-control" }}
+      </div>
+
+      <div class="col-12 d-grid d-md-flex justify-content-md-end mt-2">
+        <button class="btn btn-success px-4" type="submit">
+          <i class="fa-solid fa-search me-1"></i> Search
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Keep your original toggle behavior:
+  if (window.TurEco && typeof window.TurEco.toggleSearchFields === "function") {
+    window.TurEco.toggleSearchFields();
+  } else {
+    // Fallback: simple inline toggle based on select value
+    const typeEl = document.getElementById('id_search_type');
+    const hotelFields = document.querySelectorAll('.js-hotel');
+    const transportFields = document.querySelectorAll('.js-transport');
+    function apply() {
+      const isHotel = typeEl && typeEl.value === 'hotel';
+      hotelFields.forEach(el => el.style.display = isHotel ? '' : 'none');
+      transportFields.forEach(el => el.style.display = isHotel ? 'none' : '');
+    }
+    if (typeEl) {
+      typeEl.addEventListener('change', apply);
+      apply();
+    }
+  }
+</script>
+{% endblock %}

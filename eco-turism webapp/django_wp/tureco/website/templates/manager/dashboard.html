@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Manager Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="h3 mb-3">
+        <i class="fa-solid fa-gauge me-2"></i>Manager Dashboard
+      </h1>
+      <p class="text-muted">Welcome, {{ manager.email }}</p>
+    </div>
+  </div>
+
+  {% if is_hotel_manager %}
+  <!-- Hotel Manager Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fa-solid fa-hotel me-2"></i>My Hotels
+          </h5>
+          <a href="{% url 'website:add_hotel' %}" class="btn btn-light btn-sm">
+            <i class="fa-solid fa-plus me-2"></i>Add New Hotel
+          </a>
+        </div>
+        <div class="card-body">
+          {% if hotels %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Hotel Name</th>
+                    <th>City</th>
+                    <th>Address</th>
+                    <th>Rooms</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for hotel in hotels %}
+                  <tr>
+                    <td>
+                      <strong>{{ hotel.name }}</strong>
+                      {% if hotel.tags %}
+                        <br><small class="text-muted">{{ hotel.tags }}</small>
+                      {% endif %}
+                    </td>
+                    <td>{{ hotel.city }}</td>
+                    <td>{{ hotel.address }}</td>
+                    <td>
+                      <span class="badge bg-info">{{ hotel.rooms.count }} type(s)</span>
+                      <a href="{% url 'website:add_room' hotel.id %}" class="btn btn-sm btn-outline-primary ms-2">
+                        <i class="fa-solid fa-plus"></i> Add Room
+                      </a>
+                    </td>
+                    <td>
+                      <div class="btn-group" role="group">
+                        <a href="{% url 'website:hotel_detail' hotel.id %}" class="btn btn-sm btn-outline-secondary" title="View">
+                          <i class="fa-solid fa-eye"></i>
+                        </a>
+                        <a href="{% url 'website:edit_hotel' hotel.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                          <i class="fa-solid fa-edit"></i>
+                        </a>
+                        <a href="{% url 'website:delete_hotel' hotel.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                          <i class="fa-solid fa-trash"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <i class="fa-solid fa-hotel fa-3x text-muted mb-3"></i>
+              <p class="text-muted">You haven't added any hotels yet.</p>
+              <a href="{% url 'website:add_hotel' %}" class="btn btn-primary">
+                <i class="fa-solid fa-plus me-2"></i>Add Your First Hotel
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if is_transport_manager %}
+  <!-- Transport Manager Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fa-solid fa-bus me-2"></i>My Transportation Services
+          </h5>
+          <a href="{% url 'website:add_transportation' %}" class="btn btn-light btn-sm">
+            <i class="fa-solid fa-plus me-2"></i>Add New Trip
+          </a>
+        </div>
+        <div class="card-body">
+          {% if trips %}
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Route</th>
+                    <th>Departure</th>
+                    <th>Seats</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for trip in trips %}
+                  <tr>
+                    <td>
+                      <span class="badge bg-secondary">{{ trip.get_transport_type_display }}</span>
+                    </td>
+                    <td>
+                      <strong>{{ trip.origin_city }}</strong>
+                      <i class="fa-solid fa-arrow-right mx-1"></i>
+                      <strong>{{ trip.destination_city }}</strong>
+                      <br><small class="text-muted">{{ trip.operator_name }}</small>
+                    </td>
+                    <td>{{ trip.departure|date:"M d, Y H:i" }}</td>
+                    <td><span class="badge bg-info">{{ trip.total_seats }}</span></td>
+                    <td>£{{ trip.price_per_seat }}</td>
+                    <td>
+                      <div class="btn-group" role="group">
+                        <a href="{% url 'website:transportation_detail' trip.id %}" class="btn btn-sm btn-outline-secondary" title="View">
+                          <i class="fa-solid fa-eye"></i>
+                        </a>
+                        <a href="{% url 'website:edit_transportation' trip.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                          <i class="fa-solid fa-edit"></i>
+                        </a>
+                        <a href="{% url 'website:delete_transportation' trip.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                          <i class="fa-solid fa-trash"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <i class="fa-solid fa-bus fa-3x text-muted mb-3"></i>
+              <p class="text-muted">You haven't added any transportation services yet.</p>
+              <a href="{% url 'website:add_transportation' %}" class="btn btn-success">
+                <i class="fa-solid fa-plus me-2"></i>Add Your First Trip
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-12">
+      <a href="{% url 'website:search' %}" class="btn btn-outline-secondary">
+        <i class="fa-solid fa-arrow-left me-2"></i>Back to Search
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

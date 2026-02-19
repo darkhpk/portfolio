@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Hotel{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="fa-solid fa-edit me-2"></i>Edit Hotel
+          </h4>
+        </div>
+        <div class="card-body">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+
+            <div class="mb-3">
+              <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+              {{ form.name }}
+              {% if form.name.errors %}
+                <div class="invalid-feedback d-block">{{ form.name.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.city.id_for_label }}" class="form-label">{{ form.city.label }}</label>
+                {{ form.city }}
+                {% if form.city.errors %}
+                  <div class="invalid-feedback d-block">{{ form.city.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.address.id_for_label }}" class="form-label">{{ form.address.label }}</label>
+                {{ form.address }}
+                {% if form.address.errors %}
+                  <div class="invalid-feedback d-block">{{ form.address.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }}</label>
+              {{ form.description }}
+              {% if form.description.errors %}
+                <div class="invalid-feedback d-block">{{ form.description.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.thumbnail_url.id_for_label }}" class="form-label">{{ form.thumbnail_url.label }}</label>
+              {{ form.thumbnail_url }}
+              {% if form.thumbnail_url.errors %}
+                <div class="invalid-feedback d-block">{{ form.thumbnail_url.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.tags.id_for_label }}" class="form-label">{{ form.tags.label }}</label>
+              {{ form.tags }}
+              {% if form.tags.errors %}
+                <div class="invalid-feedback d-block">{{ form.tags.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-save me-2"></i>Update Hotel
+              </button>
+              <a href="{% url 'website:manager_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-times me-2"></i>Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

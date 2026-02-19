@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load form_tags %}
+
+{% block title %}Login — Tur’Eco{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h1 class="h4 mb-4 text-success">Login</h1>
+
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="mb-3">
+              <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+              {{ form.email|add_class:"form-control" }}
+              {% if form.email.errors %}
+                <div class="invalid-feedback d-block">{{ form.email.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <label for="{{ form.password.id_for_label }}" class="form-label mb-0">Password</label>
+                <button type="button" class="btn btn-link btn-sm p-0" onclick="togglePw()">
+                  Show/Hide
+                </button>
+              </div>
+              {{ form.password|add_class:"form-control" }}
+              {% if form.password.errors %}
+                <div class="invalid-feedback d-block">{{ form.password.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+
+            <!-- The missing submit button -->
+            <button class="btn btn-success" type="submit">
+              Log in
+            </button>
+          </form>
+
+          <p class="text-center text-muted mt-3 mb-0">
+            No account? <a href="{% url 'customer_signup' %}">Sign up</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block scripts %}
+<script>
+  function togglePw() {
+    const input = document.getElementById("{{ form.password.id_for_label }}");
+    if (!input) return;
+    input.type = (input.type === "password") ? "text" : "password";
+  }
+</script>
+{% endblock %}
+{% endblock %}

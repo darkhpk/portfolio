@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Reply to review{% endblock %}
+{% block content %}
+<div class="section section--narrow">
+  <div class="card">
+    <h2 class="h2">Reply to review for {{ hotel.name }}</h2>
+    <p class="muted">Original: "{{ review.comment|default:'(no comment)'}}"</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-field">
+        <label>Your reply</label>
+        <textarea name="comment" rows="4" class="form-control" required></textarea>
+      </div>
+      <button class="btn btn--primary mt-2" type="submit">Post reply</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

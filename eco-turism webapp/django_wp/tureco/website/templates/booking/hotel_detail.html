@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+{% load static %}
+{% load form_tags %}
+
+{% block title %}{{ hotel.name }} — Tur’Eco{% endblock %}
+
+{% block content %}
+<div class="py-4">
+
+  <!-- Back to Search Button -->
+  <div class="mb-3">
+    <a href="{% url 'website:results' %}?search_type=hotel{% if request.GET.city_to %}&city_to={{ request.GET.city_to|urlencode }}{% endif %}{% if request.GET.check_in %}&check_in={{ request.GET.check_in|urlencode }}{% endif %}{% if request.GET.check_out %}&check_out={{ request.GET.check_out|urlencode }}{% endif %}{% if request.GET.persons %}&persons={{ request.GET.persons|urlencode }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by|urlencode }}{% endif %}" class="btn btn-secondary">
+      <i class="fa-solid fa-arrow-left me-2"></i>Back to Search Results
+    </a>
+  </div>
+
+  <!-- 🏨 Hotel Header -->
+  <div class="card mb-4 shadow-sm">
+    {% if hotel.thumbnail_url %}
+      <img src="{{ hotel.thumbnail_url }}" class="card-img-top" style="max-height: 400px; object-fit: cover;" alt="{{ hotel.name }}">
+    {% else %}
+      <img src="{% static 'uploads/hotel-thumbnail.jpeg' %}" class="card-img-top" style="max-height: 400px; object-fit: cover;" alt="Hotel image">
+    {% endif %}
+
+    <div class="card-body">
+      <h2 class="h4 text-success">{{ hotel.name }}</h2>
+      <p class="text-muted mb-2">
+        <i class="fa-solid fa-location-dot me-1"></i>{{ hotel.address }}, {{ hotel.city }}
+      </p>
+      <p>{{ hotel.description }}</p>
+
+      <span class="ms-1">Rating:</span>
+      <i class="fa-solid fa-star text-warning"></i> {{ avg_rating|floatformat:1 }} / 5
+
+      <span class="ms-1">Eco Rating:</span>
+      <i class="fa-solid fa-leaf text-success"></i> {{ eco_avg_rating|floatformat:1 }} / 5
+    </div>
+  </div>
+
+    <!-- 📅 Dates toolbar -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+    {% if check_in and check_out %}
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge text-bg-success">
+                <i class="fa-solid fa-calendar-check me-1"></i>
+                {{ check_in|date:"M d, Y" }} → {{ check_out|date:"M d, Y" }}
+            </span>
+        </div>
+        <button class="btn btn-outline-success btn-sm" data-bs-toggle="collapse" data-bs-target="#datesCollapse">
+            <i class="fa-solid fa-calendar-days me-1"></i> Change dates
+        </button>
+    {% else %}
+        <div></div>
+        <button class="btn btn-outline-success btn-sm" data-bs-toggle="collapse" data-bs-target="#datesCollapse">
+            <i class="fa-solid fa-calendar-days me-1"></i> Select dates
+        </button>
+    {% endif %}
+    </div>
+
+    <!-- 🔽 Collapsible date form (GET reload keeps you on this page with params) -->
+    <div class="collapse mb-4" id="datesCollapse">
+        <div class="card card-body">
+            <form method="get" class="row g-3">
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Check-in</label>
+                    <input type="date" name="check_in" class="form-control" value="{{ q_check_in }}">
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Check-out</label>
+                    <input type="date" name="check_out" class="form-control" value="{{ q_check_out }}">
+                </div>
+                {# Keep any other query parameters (e.g., persons) if you use them #}
+                {% if request.GET.persons %}
+                    <input type="hidden" name="persons" value="{{ request.GET.persons|urlencode }}">
+                {% endif %}
+                <div class="col-12 col-md-4 d-flex align-items-end">
+                    <button class="btn btn-success w-100" type="submit">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i> Update availability
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- 🛏️ Rooms & Availability -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+        <h3 class="h5 text-success mb-3"><i class="fa-solid fa-bed me-2"></i>Rooms & Availability</h3>
+
+        {% if rooms_info %}
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Room</th>
+                            <th class="text-center">Max persons</th>
+                            <th class="text-center">Price / night</th>
+                            <th class="text-center">Available</th>
+                            <th class="text-end"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for ri in rooms_info %}
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">{{ ri.room.name }}</div>
+                                {% if ri.room.description %}<div class="small text-muted">{{ ri.room.description }}</div>{% endif %}
+                            </td>
+                            <td class="text-center">{{ ri.room.max_persons }}</td>
+                            <td class="text-center">€{{ ri.room.price_per_night }}</td>
+                            <td class="text-center">
+                                {% if ri.available is not None %}
+                                {% if ri.available > 0 %}
+                                    <span class="badge text-bg-success">{{ ri.available }} left</span>
+                                {% else %}
+                                    <span class="badge text-bg-danger">Sold out</span>
+                                {% endif %}
+                                {% else %}
+                                <span class="badge text-bg-secondary">Select dates</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                {% if ri.available is not None and ri.available > 0 %}
+                                <a href="{% url 'website:book_room' room_type_id=ri.room.id %}" class="btn btn-success btn-sm">
+                                    <i class="fa-solid fa-calendar-check me-1"></i> Book
+                                </a>
+                                {% else %}
+                                <button class="btn btn-outline-secondary btn-sm" disabled>
+                                    <i class="fa-regular fa-calendar-xmark me-1"></i> Unavailable
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% elif hotel.rooms.all %}
+            <div class="row g-3">
+            {% for room in hotel.rooms.all %}
+                <div class="col-12 col-md-6">
+                    <div class="border rounded p-3 h-100">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div class="fw-semibold">{{ room.name }}</div>
+                                {% if room.description %}<div class="small text-muted">{{ room.description }}</div>{% endif %}
+                                <div class="small mt-1"><i class="fa-solid fa-user-group me-1"></i>Max {{ room.max_persons }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-semibold">£{{ room.price_per_night }}</div>
+                                <div class="small text-muted">/ night</div>
+                            </div>
+                        </div>
+                        <div class="text-end mt-3">
+                            <a href="{% url 'website:book_room' room_type_id=room.id %}" class="btn btn-success btn-sm">
+                                <i class="fa-solid fa-calendar-check me-1"></i> Book
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info mb-0">No rooms defined for this hotel yet.</div>
+        {% endif %}
+        </div>
+    </div>
+
+  <!-- 💬 Reviews Section -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h3 class="h5 text-success mb-3"><i class="fa-solid fa-comments me-2"></i>Reviews</h3>
+
+      {% if reviews %}
+        {% for review in reviews %}
+          <div class="border rounded p-3 mb-3">
+            <div class="d-flex justify-content-between">
+              <div>
+                <strong>{{ review.customer.account_id.username|default:"Anonymous" }}</strong>
+                <small class="text-muted d-block">{{ review.created_at|date:"M d, Y H:i" }}</small>
+              </div>
+              {% if request.user == review.staff_user or request.user == review.customer.account_id or request.user.is_staff or request.user.is_superuser %}
+              <div class="btn-group">
+                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal{{ review.id }}"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ review.id }}"><i class="fa-solid fa-trash"></i></button>
+              </div>
+              {% endif %}
+            </div>
+
+            <p class="mt-2 mb-1">{{ review.comment }}</p>
+
+            <!-- ⭐ Ratings -->
+            <div class="mt-1">
+                {% if review.rating %}
+                    <span class="me-2">
+                        <i class="fa-solid fa-star text-warning"></i>
+                        <small class="text-muted ms-1">{{ review.rating }}/5</small>
+                    </span>
+                {% else %}
+                    <span class="me-2">
+                        <i class="fa-solid fa-star text-warning"></i>
+                        <small class="text-muted ms-1">0/5</small>
+                    </span>
+                {% endif %}
+
+                {% if review.eco_rating %}
+                    <span>
+                        <i class="fa-solid fa-leaf text-success"></i>
+                        <small class="text-success ms-1">{{ review.eco_rating }}/5</small>
+                    </span>
+                {% else %}
+                    <span>
+                        <i class="fa-solid fa-leaf text-success"></i>
+                        <small class="text-success ms-1">0/5</small>
+                    </span>
+                {% endif %}
+            </div>
+
+            <!-- Replies -->
+            {% for reply in review.replies.all %}
+              <div class="mt-3 ms-4 p-3 border-start border-success" id="review-{{ reply.id }}">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <strong class="text-success">
+                      {% if reply.staff_user %}{{ reply.staff_user.username }} (staff)
+                      {% elif reply.account_id %}{{ reply.account_id }}
+                      {% else %}User{% endif %}
+                    </strong>
+                    <small class="text-muted d-block">{{ reply.created_at|date:"M d, Y H:i" }}</small>
+                  </div>
+                  {% if request.user.is_authenticated and request.user.is_staff or request.user.is_superuser or reply.staff_user and reply.staff_user == request.user %}
+                    <div class="btn-group">
+                      <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal{{ reply.id }}"><i class="fa-solid fa-pen"></i></button>
+                      <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ reply.id }}"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                  {% endif %}
+                </div>
+                {% if reply.comment %}
+                  <p class="mb-1">{{ reply.comment }}</p>
+                {% endif %}
+              </div>
+
+              <!-- ✏️ Edit Reply Modal -->
+              <div class="modal fade" id="editModal{{ reply.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ reply.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form method="post" action="{% url 'website:edit_review' review_id=reply.id %}">
+                      {% csrf_token %}
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel{{ reply.id }}">Edit Reply</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <textarea name="comment" rows="4" class="form-control" required>{{ reply.comment }}</textarea>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Save changes</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 🗑️ Delete Reply Modal -->
+              <div class="modal fade" id="deleteModal{{ reply.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ reply.id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <form method="post" action="{% url 'website:delete_review' review_id=reply.id %}">
+                      {% csrf_token %}
+                      <div class="modal-header">
+                        <h5 class="modal-title text-danger" id="deleteModalLabel{{ reply.id }}">Delete Reply</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">Are you sure you want to delete this reply? This action cannot be undone.</div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+
+            {% if request.user.is_staff or request.user.is_superuser %}
+              <div class="mt-3">
+                <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#replyModal{{ review.id }}">
+                  <i class="fa-solid fa-reply me-1"></i> Reply
+                </button>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- 📨 Reply Modal -->
+          <div class="modal fade" id="replyModal{{ review.id }}" tabindex="-1" aria-labelledby="replyModalLabel{{ review.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form method="post" action="{% url 'website:reply_to_review' review_id=review.id %}">
+                  {% csrf_token %}
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="replyModalLabel{{ review.id }}">Reply to Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p class="small text-muted mb-2"><em>Original:</em> {{ review.comment|default:"(no comment)" }}</p>
+                    <textarea name="comment" rows="4" class="form-control" placeholder="Write your reply..." required></textarea>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Post reply</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- ✏️ Edit Review Modal -->
+          <div class="modal fade" id="editModal{{ review.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ review.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form method="post" action="{% url 'website:edit_review' review_id=review.id %}">
+                  {% csrf_token %}
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel{{ review.id }}">Edit Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <textarea name="comment" rows="4" class="form-control">{{ review.comment }}</textarea>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- 🗑️ Delete Review Modal -->
+          <div class="modal fade" id="deleteModal{{ review.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ review.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <form method="post" action="{% url 'website:delete_review' review_id=review.id %}">
+                  {% csrf_token %}
+                  <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="deleteModalLabel{{ review.id }}">Delete Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">Are you sure you want to delete this review? This action cannot be undone.</div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="alert alert-info text-center">No reviews yet. Be the first to share your experience!</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ✍️ Add Review Form -->
+  {% if request.user.is_authenticated %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="text-success mb-3"><i class="fa-solid fa-pen me-2"></i>Leave a Review</h5>
+        <form method="post" action="{% url 'website:add_review' hotel_id=hotel.id %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <textarea name="comment" rows="4" class="form-control" placeholder="Share your experience..." required></textarea>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <label class="form-label me-2 mb-0">Rate:</label>
+              <select name="rate" class="form-select d-inline-block w-auto">
+                {% for i in "12345" %}
+                  <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+              </select>
+              <label class="form-label ms-3 me-2 mb-0">Eco Rating:</label>
+              <select name="eco_rate" class="form-select d-inline-block w-auto">
+                {% for i in "12345" %}
+                  <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="btn btn-success"><i class="fa-solid fa-paper-plane me-1"></i> Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% else %}
+    <div class="alert alert-warning text-center">
+      <a href="{% url 'customer_login' %}" class="text-success fw-semibold">Log in</a> to leave a review.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

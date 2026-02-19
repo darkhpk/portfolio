@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+
+{% block title %}Book {{ trip.get_transport_type_display }} — {{ trip.operator_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Trip Info Card -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h2 class="h4 text-success mb-3">
+            <i class="fa-solid fa-{% if trip.transport_type == 'bus' %}bus{% elif trip.transport_type == 'train' %}train{% else %}plane{% endif %} me-2"></i>
+            Book {{ trip.get_transport_type_display }}
+          </h2>
+          <p class="text-muted mb-3">
+            <i class="fa-solid fa-building me-2"></i><strong>{{ trip.operator_name }}</strong>
+          </p>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <div class="d-flex align-items-center mb-2">
+                <i class="fa-solid fa-location-dot text-primary me-2"></i>
+                <div>
+                  <small class="text-muted d-block">From</small>
+                  <strong>{{ trip.origin_city }}</strong>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <i class="fa-solid fa-clock text-primary me-2"></i>
+                <div>
+                  <small class="text-muted d-block">Departure</small>
+                  <strong>{{ trip.departure|date:"M d, Y - H:i" }}</strong>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="d-flex align-items-center mb-2">
+                <i class="fa-solid fa-location-dot text-success me-2"></i>
+                <div>
+                  <small class="text-muted d-block">To</small>
+                  <strong>{{ trip.destination_city }}</strong>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <i class="fa-solid fa-clock text-success me-2"></i>
+                <div>
+                  <small class="text-muted d-block">Arrival</small>
+                  <strong>{{ trip.arrival|date:"M d, Y - H:i" }}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Price per Seat:</strong> €{{ trip.price_per_seat }}</p>
+            </div>
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Available Seats:</strong> <span class="badge bg-info">{{ available }}</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Form Card -->
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h3 class="h5 mb-4"><i class="fa-solid fa-ticket me-2"></i>Booking Details</h3>
+          
+          <!-- Important Travel Information -->
+          <div class="alert alert-info mb-4">
+            <h6 class="alert-heading">
+              <i class="fa-solid fa-info-circle me-2"></i>Important Information
+            </h6>
+            <hr>
+            <ul class="mb-0 small">
+              <li>Please arrive at the departure point at least 30 minutes before departure time.</li>
+              <li>Valid ID is required for boarding.</li>
+              <li>Baggage allowance and restrictions apply based on the transport type.</li>
+            </ul>
+          </div>
+          
+          <form method="post" id="bookingForm" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger" role="alert">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+
+            <!-- Number of Seats -->
+            <div class="mb-4">
+              <label for="{{ form.seats_booked.id_for_label }}" class="form-label">
+                <i class="fa-solid fa-chair me-1"></i>{{ form.seats_booked.label }}
+              </label>
+              {{ form.seats_booked }}
+              {% if form.seats_booked.errors %}
+                <div class="invalid-feedback d-block">
+                  {{ form.seats_booked.errors|join:"," }}
+                </div>
+              {% endif %}
+              <div class="form-text">How many seats do you need? (Max available: {{ available }})</div>
+            </div>
+
+            <!-- Guest Information (for non-logged-in users) -->
+            {% if not is_logged_in %}
+            <div class="card bg-light mb-4">
+              <div class="card-body">
+                <h6 class="card-title text-success mb-3">
+                  <i class="fa-solid fa-user me-2"></i>Guest Information
+                </h6>
+                <p class="text-muted small mb-3">
+                  Please provide your contact details to complete the booking as a guest, or 
+                  <a href="{% url 'customer_login' %}" class="text-success fw-bold">log in</a> to your account.
+                </p>
+                
+                <div class="row">
+                  <!-- Guest Name -->
+                  <div class="col-md-12 mb-3">
+                    <label for="{{ form.guest_name.id_for_label }}" class="form-label">
+                      {{ form.guest_name.label }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.guest_name }}
+                    {% if form.guest_name.errors %}
+                      <div class="invalid-feedback d-block">
+                        {{ form.guest_name.errors|join:", " }}
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Guest Email -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.guest_email.id_for_label }}" class="form-label">
+                      {{ form.guest_email.label }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.guest_email }}
+                    {% if form.guest_email.errors %}
+                      <div class="invalid-feedback d-block">
+                        {{ form.guest_email.errors|join:", " }}
+                      </div>
+                    {% endif %}
+                    <div class="form-text">Booking confirmation will be sent here</div>
+                  </div>
+
+                  <!-- Guest Phone -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.guest_phone.id_for_label }}" class="form-label">
+                      {{ form.guest_phone.label }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.guest_phone }}
+                    {% if form.guest_phone.errors %}
+                      <div class="invalid-feedback d-block">
+                        {{ form.guest_phone.errors|join:", " }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="alert alert-success mb-4">
+              <i class="fa-solid fa-user-check me-2"></i>
+              Booking as: <strong>{{ request.session.customer_email|default:"Registered User" }}</strong>
+            </div>
+            {% endif %}
+
+            <!-- Total Price Display -->
+            <div class="alert alert-success" id="pricePreview" style="display: none;">
+              <strong>Total Price:</strong> <span id="totalPrice">€0</span>
+              <small class="d-block mt-1" id="seatsCount"></small>
+            </div>
+
+            <!-- Terms and Conditions -->
+            <div class="card bg-light mb-4">
+              <div class="card-body">
+                <h6 class="card-title">
+                  <i class="fa-solid fa-file-contract me-2"></i>Terms and Conditions
+                </h6>
+                <div class="terms-content" style="max-height: 200px; overflow-y: auto; font-size: 0.9rem;">
+                  <ul class="mb-2">
+                    <li>Cancellation must be made at least 24 hours before departure for a full refund.</li>
+                    <li>A valid ID and booking confirmation are required at check-in.</li>
+                    <li>Passengers must arrive at least 30 minutes before departure time.</li>
+                    <li>Baggage restrictions apply - check with the operator for specific limits.</li>
+                    <li>The operator reserves the right to cancel or reschedule due to weather or technical issues.</li>
+                    <li>No-show passengers forfeit their booking and are not eligible for refunds.</li>
+                    <li>Children under 2 years may travel free without a seat (operator discretion).</li>
+                    <li>Special assistance requests should be made at least 48 hours in advance.</li>
+                  </ul>
+                </div>
+                
+                <div class="form-check mt-3">
+                  {{ form.terms_accepted }}
+                  <label class="form-check-label" for="{{ form.terms_accepted.id_for_label }}">
+                    <strong>{{ form.terms_accepted.label }}</strong>
+                  </label>
+                  {% if form.terms_accepted.errors %}
+                    <div class="invalid-feedback d-block">
+                      {{ form.terms_accepted.errors|join:"," }}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+                <i class="fa-solid fa-check me-2"></i>Confirm Booking
+              </button>
+              <a href="{% url 'website:transportation_detail' pk=trip.id %}" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-2"></i>Back to Trip Details
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Price calculation and terms validation
+  document.addEventListener('DOMContentLoaded', function() {
+    const seatsInput = document.getElementById('{{ form.seats_booked.id_for_label }}');
+    const termsCheckbox = document.getElementById('{{ form.terms_accepted.id_for_label }}');
+    const submitBtn = document.getElementById('submitBtn');
+    const pricePreview = document.getElementById('pricePreview');
+    const totalPriceSpan = document.getElementById('totalPrice');
+    const seatsCountSpan = document.getElementById('seatsCount');
+    const pricePerSeat = {{ trip.price_per_seat }};
+    const maxAvailable = {{ available }};
+
+    // Enable/disable submit button based on terms acceptance
+    function updateSubmitButton() {
+      if (termsCheckbox && termsCheckbox.checked) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('disabled');
+      } else {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('disabled');
+      }
+    }
+
+    // Initial state
+    if (termsCheckbox) {
+      updateSubmitButton();
+      termsCheckbox.addEventListener('change', updateSubmitButton);
+    }
+
+    // Validate seat count
+    seatsInput.addEventListener('input', function() {
+      const seats = parseInt(this.value) || 0;
+      
+      if (seats > maxAvailable) {
+        this.setCustomValidity('Not enough seats available');
+        this.classList.add('is-invalid');
+      } else if (seats < 1) {
+        this.setCustomValidity('Please select at least 1 seat');
+        this.classList.add('is-invalid');
+      } else {
+        this.setCustomValidity('');
+        this.classList.remove('is-invalid');
+      }
+      
+      calculatePrice();
+    });
+
+    function calculatePrice() {
+      if (seatsInput.value) {
+        const seats = parseInt(seatsInput.value) || 0;
+        
+        if (seats > 0 && seats <= maxAvailable) {
+          const total = seats * pricePerSeat;
+          
+          totalPriceSpan.textContent = '£' + total.toFixed(2);
+          seatsCountSpan.textContent = seats + ' seat(s) × £' + pricePerSeat + ' per seat';
+          pricePreview.style.display = 'block';
+        } else {
+          pricePreview.style.display = 'none';
+        }
+      } else {
+        pricePreview.style.display = 'none';
+      }
+    }
+
+    // Initial calculation if form has values
+    calculatePrice();
+  });
+</script>
+{% endblock %}

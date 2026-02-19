@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load form_tags %}
+
+{% block title %}Login — Tur’Eco{% endblock %}
+{% block content %}
+<section class="section py-4">
+  <div class="card shadow-sm p-4">
+	<h2 class="card-title">Login</h2>
+    <form method="post" novalidate class="row g-3">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      
+      <div class="form-field">
+        <label for="id_email" class="form-label">Email</label>
+        {{ form.email|add_class:"form-control" }}
+        {% for error in form.email.errors %}
+          <div class="text-danger small">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="form-field">
+		<div class="d-flex justify-content-between align-items-center">
+			<label for="id_password" class="form-label">Password</label>
+			<button type="button" class="btn btn-link btn-sm p-0" onclick="togglePw()">
+				Show/Hide
+			</button>
+		</div>
+        {{ form.password|add_class:"form-control" }}
+		
+        {% for error in form.password.errors %}
+          <div class="text-danger small">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <button class="btn btn-primary w-100 px-4" type="submit">Log in</button>
+    </form>
+
+    <p class="muted center mt-16">No account? <a href="{% url 'customer_signup' %}">Sign up</a></p>
+  </div>
+</section>
+{% block scripts %}
+<script>
+  function togglePw() {
+    const input = document.getElementById("{{ form.password.id_for_label }}");
+    if (!input) return;
+    input.type = (input.type === "password") ? "text" : "password";
+  }
+</script>
+{% endblock %}
+{% endblock %}

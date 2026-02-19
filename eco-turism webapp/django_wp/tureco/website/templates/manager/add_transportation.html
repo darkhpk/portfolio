@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Transportation{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0">
+            <i class="fa-solid fa-bus me-2"></i>Add New Transportation Service
+          </h4>
+        </div>
+        <div class="card-body">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.transport_type.id_for_label }}" class="form-label">{{ form.transport_type.label }}</label>
+                {{ form.transport_type }}
+                {% if form.transport_type.errors %}
+                  <div class="invalid-feedback d-block">{{ form.transport_type.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.operator_name.id_for_label }}" class="form-label">{{ form.operator_name.label }}</label>
+                {{ form.operator_name }}
+                {% if form.operator_name.errors %}
+                  <div class="invalid-feedback d-block">{{ form.operator_name.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.origin_city.id_for_label }}" class="form-label">{{ form.origin_city.label }}</label>
+                {{ form.origin_city }}
+                {% if form.origin_city.errors %}
+                  <div class="invalid-feedback d-block">{{ form.origin_city.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.destination_city.id_for_label }}" class="form-label">{{ form.destination_city.label }}</label>
+                {{ form.destination_city }}
+                {% if form.destination_city.errors %}
+                  <div class="invalid-feedback d-block">{{ form.destination_city.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.departure.id_for_label }}" class="form-label">{{ form.departure.label }}</label>
+                {{ form.departure }}
+                {% if form.departure.errors %}
+                  <div class="invalid-feedback d-block">{{ form.departure.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.arrival.id_for_label }}" class="form-label">{{ form.arrival.label }}</label>
+                {{ form.arrival }}
+                {% if form.arrival.errors %}
+                  <div class="invalid-feedback d-block">{{ form.arrival.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.car_reg.id_for_label }}" class="form-label">{{ form.car_reg.label }}</label>
+                {{ form.car_reg }}
+                {% if form.car_reg.errors %}
+                  <div class="invalid-feedback d-block">{{ form.car_reg.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.total_seats.id_for_label }}" class="form-label">{{ form.total_seats.label }}</label>
+                {{ form.total_seats }}
+                {% if form.total_seats.errors %}
+                  <div class="invalid-feedback d-block">{{ form.total_seats.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="{{ form.price_per_seat.id_for_label }}" class="form-label">{{ form.price_per_seat.label }}</label>
+                {{ form.price_per_seat }}
+                {% if form.price_per_seat.errors %}
+                  <div class="invalid-feedback d-block">{{ form.price_per_seat.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.thumbnail_url.id_for_label }}" class="form-label">{{ form.thumbnail_url.label }}</label>
+              {{ form.thumbnail_url }}
+              {% if form.thumbnail_url.errors %}
+                <div class="invalid-feedback d-block">{{ form.thumbnail_url.errors|join:", " }}</div>
+              {% endif %}
+              <small class="form-text text-muted">Optional: Add a link to vehicle/route image</small>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success btn-lg">
+                <i class="fa-solid fa-save me-2"></i>Save Transportation
+              </button>
+              <a href="{% url 'website:manager_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-times me-2"></i>Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

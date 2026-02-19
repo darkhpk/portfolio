@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+{% load form_tags %}
+
+{% block title %}Results — Tur’Eco{% endblock %}
+
+{% block content %}
+<div class="py-4">
+
+  <!-- 🔍 Search Summary -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h2 class="h4 text-bg-color mb-2">
+      <i class="fa-solid fa-leaf me-2"></i>Search Results
+      {% if hotels %}<span class="badge bg-success ms-2">{{ hotels|length }} hotel{{ hotels|length|pluralize }}</span>{% endif %}
+      {% if trips %}<span class="badge bg-success ms-2">{{ trips|length }} trip{{ trips|length|pluralize }}</span>{% endif %}
+    </h2>
+    <a href="{% url 'website:search' %}" class="btn btn-success btn-sm">
+      <i class="fa-solid fa-arrow-left me-1"></i> New Search
+    </a>
+  </div>
+
+  <!-- 🔽 Sort & Filter Bar -->
+  {% if hotels or trips %}
+  <div class="card card-body mb-4 shadow-sm">
+    <form method="get" class="row g-3 align-items-end">
+      <!-- Preserve search parameters -->
+      <input type="hidden" name="search_type" value="{{ search_type }}">
+      {% if request.GET.city_from %}<input type="hidden" name="city_from" value="{{ request.GET.city_from }}">{% endif %}
+      {% if request.GET.city_to %}<input type="hidden" name="city_to" value="{{ request.GET.city_to }}">{% endif %}
+      {% if request.GET.check_in %}<input type="hidden" name="check_in" value="{{ request.GET.check_in }}">{% endif %}
+      {% if request.GET.check_out %}<input type="hidden" name="check_out" value="{{ request.GET.check_out }}">{% endif %}
+      {% if request.GET.departure %}<input type="hidden" name="departure" value="{{ request.GET.departure }}">{% endif %}
+      {% if request.GET.persons %}<input type="hidden" name="persons" value="{{ request.GET.persons }}">{% endif %}
+      
+      <div class="col-auto">
+        <label class="form-label mb-1"><i class="fa-solid fa-sort me-1"></i>Sort by:</label>
+      </div>
+      <div class="col-auto">
+        <select name="sort_by" class="form-select form-select-sm" onchange="this.form.submit()">
+          {% if search_type == 'hotel' %}
+            <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name</option>
+            <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+            <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Rating</option>
+          {% else %}
+            <option value="time" {% if sort_by == 'time' %}selected{% endif %}>Departure Time</option>
+            <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+          {% endif %}
+        </select>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+
+  {% if hotels %}
+    <!-- 🏨 Hotel Results -->
+    <div class="row g-4">
+      {% for hotel in hotels %}
+      <div class="col-12 col-sm-6 col-lg-4">
+        <div class="card h-100 shadow-sm">
+          {% if hotel.obj.thumbnail_url %}
+          <img src="{{ hotel.obj.thumbnail_url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ hotel.obj.name }}">
+          {% else %}
+          <img src="{% static 'uploads/hotel-thumbnail.jpg' %}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Hotel image">
+          {% endif %}
+
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title text-success">{{ hotel.obj.name }}</h5>
+            <p class="card-text text-muted small mb-2"><i class="fa-solid fa-location-dot me-1"></i>{{ hotel.obj.city }}</p>
+
+            {% if hotel.avg_rating %}
+              <p class="mb-2">
+                <i class="fa-solid fa-star text-warning"></i> <strong>{{ hotel.avg_rating }}</strong> / 5
+              </p>
+            {% endif %}
+
+            {% if hotel.cheapest_room %}
+              <div class="mb-3">
+                <span class="badge bg-success-subtle text-success">
+                  <i class="fa-solid fa-bed me-1"></i>{{ hotel.cheapest_room.name }}
+                </span>
+                <div class="mt-2">
+                  <span class="text-muted small">From</span>
+                  <span class="h5 text-success mb-0">£{{ hotel.price }}</span>
+                  <span class="text-muted small">/ night</span>
+                </div>
+              </div>
+            {% endif %}
+
+            <div class="mt-auto">
+              <a href="{% url 'website:hotel_detail' pk=hotel.obj.id %}{% if check_in or check_out or persons %}?{% endif %}{% if check_in %}check_in={{ check_in|date:'Y-m-d' }}{% endif %}{% if check_out %}{% if check_in %}&{% endif %}check_out={{ check_out|date:'Y-m-d' }}{% endif %}{% if persons %}{% if check_in or check_out %}&{% endif %}persons={{ persons }}{% endif %}" class="btn btn-success w-100">
+                <i class="fa-solid fa-eye me-1"></i>View Details
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  {% elif trips %}
+    <!-- 🚌 Transport Results -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-success">
+          <tr>
+            <th><i class="fa-solid fa-bus me-1"></i>Type</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Departure</th>
+            <th>Arrival</th>
+            <th class="text-center">Available Seats</th>
+            <th class="text-end">Price</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for trip in trips %}
+          <tr>
+            <td>
+              <span class="badge bg-info">
+                {% if trip.obj.transport_type == 'bus' %}
+                  <i class="fa-solid fa-bus me-1"></i>Bus
+                {% elif trip.obj.transport_type == 'train' %}
+                  <i class="fa-solid fa-train me-1"></i>Train
+                {% elif trip.obj.transport_type == 'plane' %}
+                  <i class="fa-solid fa-plane me-1"></i>Plane
+                {% else %}
+                  {{ trip.obj.transport_type|title }}
+                {% endif %}
+              </span>
+            </td>
+            <td><strong>{{ trip.obj.origin_city }}</strong></td>
+            <td><strong>{{ trip.obj.destination_city }}</strong></td>
+            <td>{{ trip.obj.departure|date:"M d, Y H:i" }}</td>
+            <td>{{ trip.obj.arrival|date:"M d, Y H:i" }}</td>
+            <td class="text-center">
+              <span class="badge {% if trip.available_seats > 10 %}bg-success{% elif trip.available_seats > 5 %}bg-warning{% else %}bg-danger{% endif %}">
+                {{ trip.available_seats }}
+              </span>
+            </td>
+            <td class="text-end"><strong>€{{ trip.price }}</strong></td>
+            <td>
+              <a href="{% url 'website:transportation_detail' pk=trip.obj.id %}" class="btn btn-sm btn-success">
+                <i class="fa-solid fa-eye me-1"></i>View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  {% else %}
+    <!-- ❌ No results -->
+    <div class="alert alert-warning text-center shadow-sm">
+      <i class="fa-solid fa-circle-exclamation me-2"></i>
+      No results found. Try a different destination or date.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

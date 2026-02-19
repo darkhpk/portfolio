@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Edit Review{% endblock %}
+{% block content %}
+<div class="section section--narrow">
+  <div class="card">
+    <h2 class="h2">Edit Your Review</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-field">
+        <label for="comment">Your comment</label>
+        <textarea id="comment" name="comment" rows="4" class="form-control" required>{{ review.comment }}</textarea>
+      </div>
+      <button type="submit" class="btn btn--primary mt-2">Save Changes</button>
+      <a href="{% url 'website:hotel_detail' pk=review.hotel_id.id %}" class="btn btn--ghost mt-2">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

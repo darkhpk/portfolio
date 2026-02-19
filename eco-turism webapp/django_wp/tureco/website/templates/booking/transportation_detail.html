@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ trip.operator_name }} — {{ trip.get_transport_type_display }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      
+      <!-- Back to Search Button -->
+      <div class="mb-3">
+        <a href="{% url 'website:results' %}?search_type=transport{% if request.GET.city_from %}&city_from={{ request.GET.city_from|urlencode }}{% endif %}{% if request.GET.city_to %}&city_to={{ request.GET.city_to|urlencode }}{% endif %}{% if request.GET.departure %}&departure={{ request.GET.departure|urlencode }}{% endif %}{% if request.GET.persons %}&persons={{ request.GET.persons|urlencode }}{% endif %}{% if request.GET.sort_by %}&sort_by={{ request.GET.sort_by|urlencode }}{% endif %}" class="btn btn-secondary">
+          <i class="fa-solid fa-arrow-left me-2"></i>Back to Search Results
+        </a>
+      </div>
+
+      <!-- Trip Header Card -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <h1 class="h3 mb-2">
+                <i class="fa-solid fa-{% if trip.transport_type == 'bus' %}bus{% elif trip.transport_type == 'train' %}train{% else %}plane{% endif %} text-primary me-2"></i>
+                {{ trip.operator_name }}
+              </h1>
+              <p class="text-muted mb-0">
+                <span class="badge bg-secondary">{{ trip.get_transport_type_display }}</span>
+                {% if trip.car_reg %}
+                <span class="badge bg-light text-dark ms-2">{{ trip.car_reg }}</span>
+                {% endif %}
+              </p>
+            </div>
+            <div class="text-end">
+              <h4 class="text-success mb-0">€{{ trip.price_per_seat }}</h4>
+              <small class="text-muted">per seat</small>
+            </div>
+          </div>
+          
+          <!-- Route Information -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <div class="border rounded p-3 h-100">
+                <div class="d-flex align-items-center mb-2">
+                  <i class="fa-solid fa-location-dot text-primary fs-4 me-3"></i>
+                  <div>
+                    <small class="text-muted d-block">Departure From</small>
+                    <h5 class="mb-0">{{ trip.origin_city }}</h5>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <i class="fa-solid fa-calendar-day text-primary fs-5 me-3"></i>
+                  <div>
+                    <small class="text-muted d-block">Date & Time</small>
+                    <strong>{{ trip.departure|date:"M d, Y" }}</strong>
+                    <span class="text-muted ms-2">{{ trip.departure|date:"H:i" }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="border rounded p-3 h-100">
+                <div class="d-flex align-items-center mb-2">
+                  <i class="fa-solid fa-location-dot text-success fs-4 me-3"></i>
+                  <div>
+                    <small class="text-muted d-block">Arrival At</small>
+                    <h5 class="mb-0">{{ trip.destination_city }}</h5>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <i class="fa-solid fa-calendar-day text-success fs-5 me-3"></i>
+                  <div>
+                    <small class="text-muted d-block">Date & Time</small>
+                    <strong>{{ trip.arrival|date:"M d, Y" }}</strong>
+                    <span class="text-muted ms-2">{{ trip.arrival|date:"H:i" }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Availability and Booking -->
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="d-flex align-items-center">
+                <i class="fa-solid fa-chair fs-4 me-3 text-info"></i>
+                <div>
+                  <small class="text-muted d-block">Available Seats</small>
+                  <h4 class="mb-0">
+                    <span class="badge {% if available > 10 %}bg-success{% elif available > 5 %}bg-warning{% else %}bg-danger{% endif %}">
+                      {{ available }} / {{ trip.total_seats }}
+                    </span>
+                  </h4>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+              {% if available > 0 %}
+                <a class="btn btn-success btn-lg" href="{% url 'website:book_trip' trip.id %}">
+                  <i class="fa-solid fa-ticket me-2"></i>Book Seats Now
+                </a>
+              {% else %}
+                <button class="btn btn-secondary btn-lg" disabled>
+                  <i class="fa-solid fa-ban me-2"></i>Fully Booked
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Information -->
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-3">
+            <i class="fa-solid fa-info-circle me-2"></i>Travel Information
+          </h5>
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <i class="fa-solid fa-check text-success me-2"></i>
+                  <strong>Comfortable seating</strong>
+                </li>
+                <li class="mb-2">
+                  <i class="fa-solid fa-check text-success me-2"></i>
+                  <strong>Air conditioning</strong>
+                </li>
+                <li class="mb-2">
+                  <i class="fa-solid fa-check text-success me-2"></i>
+                  <strong>Professional drivers</strong>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <i class="fa-solid fa-clock text-primary me-2"></i>
+                  Arrive 30 minutes before departure
+                </li>
+                <li class="mb-2">
+                  <i class="fa-solid fa-id-card text-primary me-2"></i>
+                  Valid ID required for boarding
+                </li>
+                <li class="mb-2">
+                  <i class="fa-solid fa-suitcase text-primary me-2"></i>
+                  Baggage restrictions may apply
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back Button -->
+      <div class="mt-4">
+        <a href="{% url 'website:results' %}" class="btn btn-outline-secondary">
+          <i class="fa-solid fa-arrow-left me-2"></i>Back to Search Results
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

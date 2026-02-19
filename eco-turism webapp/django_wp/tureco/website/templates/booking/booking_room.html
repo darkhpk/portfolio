@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Room — {{ room_type.hotel.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Room Info Card -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h2 class="h4 text-success mb-3">
+            <i class="fa-solid fa-bed me-2"></i>Book {{ room_type.name }}
+          </h2>
+          <p class="text-muted mb-2">
+            <i class="fa-solid fa-hotel me-2"></i>{{ room_type.hotel.name }}
+          </p>
+          <div class="row">
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Max Persons:</strong> {{ room_type.max_persons }}</p>
+              <p class="mb-1"><strong>Price per Night:</strong> £{{ room_type.price_per_night }}</p>
+            </div>
+            <div class="col-md-6">
+              <p class="mb-1"><strong>Available Rooms:</strong> {{ room_type.total_rooms }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Form Card -->
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h3 class="h5 mb-4"><i class="fa-solid fa-calendar-check me-2"></i>Booking Details</h3>
+          
+          <!-- Check-in/Check-out Times Info -->
+          <div class="alert alert-info mb-4">
+            <h6 class="alert-heading">
+              <i class="fa-solid fa-clock me-2"></i>Important Information
+            </h6>
+            <hr>
+            <div class="row">
+              <div class="col-md-6">
+                <p class="mb-1">
+                  <strong><i class="fa-solid fa-arrow-right-to-bracket me-1"></i>Check-in:</strong> After 12:00 PM (Noon)
+                </p>
+              </div>
+              <div class="col-md-6">
+                <p class="mb-1">
+                  <strong><i class="fa-solid fa-arrow-right-from-bracket me-1"></i>Check-out:</strong> Before 12:00 AM (Midnight)
+                </p>
+              </div>
+            </div>
+            <p class="mb-0 mt-2 small text-muted">
+              <i class="fa-solid fa-info-circle me-1"></i>
+              Early check-in or late check-out may be available upon request and subject to availability.
+            </p>
+          </div>
+          
+          <form method="post" id="bookingForm" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger" role="alert">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+
+            <div class="row">
+              <!-- Check-in Date -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.check_in.id_for_label }}" class="form-label">
+                  <i class="fa-solid fa-calendar-days me-1"></i>{{ form.check_in.label }}
+                </label>
+                {{ form.check_in }}
+                {% if form.check_in.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.check_in.errors|join:", " }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Select your arrival date</div>
+              </div>
+
+              <!-- Check-out Date -->
+              <div class="col-md-6 mb-3">
+                <label for="{{ form.check_out.id_for_label }}" class="form-label">
+                  <i class="fa-solid fa-calendar-days me-1"></i>{{ form.check_out.label }}
+                </label>
+                {{ form.check_out }}
+                {% if form.check_out.errors %}
+                  <div class="invalid-feedback d-block">
+                    {{ form.check_out.errors|join:", " }}
+                  </div>
+                {% endif %}
+                <div class="form-text">Select your departure date</div>
+              </div>
+            </div>
+
+            <!-- Number of Rooms -->
+            <div class="mb-4">
+              <label for="{{ form.room_booked.id_for_label }}" class="form-label">
+                <i class="fa-solid fa-door-open me-1"></i>{{ form.room_booked.label }}
+              </label>
+              {{ form.room_booked }}
+              {% if form.room_booked.errors %}
+                <div class="invalid-feedback d-block">
+                  {{ form.room_booked.errors|join:", " }}
+                </div>
+              {% endif %}
+              <div class="form-text">How many rooms do you need?</div>
+            </div>
+
+            <!-- Guest Information (for non-logged-in users) -->
+            {% if not is_logged_in %}
+            <div class="card bg-light mb-4">
+              <div class="card-body">
+                <h6 class="card-title text-success mb-3">
+                  <i class="fa-solid fa-user me-2"></i>Guest Information
+                </h6>
+                <p class="text-muted small mb-3">
+                  Please provide your contact details to complete the booking as a guest, or 
+                  <a href="{% url 'customer_login' %}" class="text-success fw-bold">log in</a> to your account.
+                </p>
+                
+                <div class="row">
+                  <!-- Guest Name -->
+                  <div class="col-md-12 mb-3">
+                    <label for="{{ form.guest_name.id_for_label }}" class="form-label">
+                      {{ form.guest_name.label }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.guest_name }}
+                    {% if form.guest_name.errors %}
+                      <div class="invalid-feedback d-block">
+                        {{ form.guest_name.errors|join:", " }}
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <!-- Guest Email -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.guest_email.id_for_label }}" class="form-label">
+                      {{ form.guest_email.label }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.guest_email }}
+                    {% if form.guest_email.errors %}
+                      <div class="invalid-feedback d-block">
+                        {{ form.guest_email.errors|join:", " }}
+                      </div>
+                    {% endif %}
+                    <div class="form-text">Booking confirmation will be sent here</div>
+                  </div>
+
+                  <!-- Guest Phone -->
+                  <div class="col-md-6 mb-3">
+                    <label for="{{ form.guest_phone.id_for_label }}" class="form-label">
+                      {{ form.guest_phone.label }} <span class="text-danger">*</span>
+                    </label>
+                    {{ form.guest_phone }}
+                    {% if form.guest_phone.errors %}
+                      <div class="invalid-feedback d-block">
+                        {{ form.guest_phone.errors|join:", " }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="alert alert-success mb-4">
+              <i class="fa-solid fa-user-check me-2"></i>
+              Booking as: <strong>{{ request.session.customer_email|default:"Registered User" }}</strong>
+            </div>
+            {% endif %}
+
+            <!-- Total Price Display -->
+            <div class="alert alert-info" id="pricePreview" style="display: none;">
+              <strong>Estimated Total:</strong> <span id="totalPrice">€0</span>
+              <small class="d-block mt-1" id="nightsCount"></small>
+            </div>
+
+            <!-- Terms and Conditions -->
+            <div class="card bg-light mb-4">
+              <div class="card-body">
+                <h6 class="card-title">
+                  <i class="fa-solid fa-file-contract me-2"></i>Terms and Conditions
+                </h6>
+                <div class="terms-content" style="max-height: 200px; overflow-y: auto; font-size: 0.9rem;">
+                  <ul class="mb-2">
+                    <li>Cancellation must be made at least 48 hours before check-in for a full refund.</li>
+                    <li>A valid ID and credit card are required at check-in.</li>
+                    <li>Smoking is strictly prohibited in all rooms.</li>
+                    <li>Pets are not allowed unless specified in the hotel policy.</li>
+                    <li>Additional charges may apply for extra guests or services.</li>
+                    <li>The hotel reserves the right to cancel bookings in case of force majeure.</li>
+                    <li>Check-in time is after 12:00 PM and check-out is before 12:00 AM.</li>
+                    <li>Damage to hotel property will be charged to the guest.</li>
+                  </ul>
+                </div>
+                
+                <div class="form-check mt-3">
+                  {{ form.terms_accepted }}
+                  <label class="form-check-label" for="{{ form.terms_accepted.id_for_label }}">
+                    <strong>{{ form.terms_accepted.label }}</strong>
+                  </label>
+                  {% if form.terms_accepted.errors %}
+                    <div class="invalid-feedback d-block">
+                      {{ form.terms_accepted.errors|join:", " }}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+                <i class="fa-solid fa-check me-2"></i>Confirm Booking
+              </button>
+              <a href="{% url 'website:hotel_detail' pk=room_type.hotel.id %}{% if request.GET.check_in %}?check_in={{ request.GET.check_in }}{% if request.GET.check_out %}&check_out={{ request.GET.check_out }}{% endif %}{% endif %}" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-2"></i>Back to Hotel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Date validation and price calculation
+  document.addEventListener('DOMContentLoaded', function() {
+    const checkInInput = document.getElementById('{{ form.check_in.id_for_label }}');
+    const checkOutInput = document.getElementById('{{ form.check_out.id_for_label }}');
+    const roomsInput = document.getElementById('{{ form.room_booked.id_for_label }}');
+    const termsCheckbox = document.getElementById('{{ form.terms_accepted.id_for_label }}');
+    const submitBtn = document.getElementById('submitBtn');
+    const pricePreview = document.getElementById('pricePreview');
+    const totalPriceSpan = document.getElementById('totalPrice');
+    const nightsCountSpan = document.getElementById('nightsCount');
+    const pricePerNight = {{ room_type.price_per_night }};
+
+    // Enable/disable submit button based on terms acceptance
+    function updateSubmitButton() {
+      if (termsCheckbox && termsCheckbox.checked) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('disabled');
+      } else {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('disabled');
+      }
+    }
+
+    // Initial state
+    if (termsCheckbox) {
+      updateSubmitButton();
+      termsCheckbox.addEventListener('change', updateSubmitButton);
+    }
+
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    checkInInput.setAttribute('min', today);
+    checkOutInput.setAttribute('min', today);
+
+    // Update check-out minimum when check-in changes
+    checkInInput.addEventListener('change', function() {
+      const checkInDate = new Date(this.value);
+      const nextDay = new Date(checkInDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      const minCheckOut = nextDay.toISOString().split('T')[0];
+      checkOutInput.setAttribute('min', minCheckOut);
+      
+      // Clear check-out if it's before new minimum
+      if (checkOutInput.value && checkOutInput.value <= this.value) {
+        checkOutInput.value = '';
+      }
+      
+      calculatePrice();
+    });
+
+    checkOutInput.addEventListener('change', calculatePrice);
+    roomsInput.addEventListener('input', calculatePrice);
+
+    function calculatePrice() {
+      if (checkInInput.value && checkOutInput.value && roomsInput.value) {
+        const checkIn = new Date(checkInInput.value);
+        const checkOut = new Date(checkOutInput.value);
+        const rooms = parseInt(roomsInput.value) || 0;
+        
+        if (checkOut > checkIn && rooms > 0) {
+          const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+          const total = nights * pricePerNight * rooms;
+          
+          totalPriceSpan.textContent = '£' + total.toFixed(2);
+          nightsCountSpan.textContent = nights + ' night(s) × ' + rooms + ' room(s) × €' + pricePerNight + ' per night';
+          pricePreview.style.display = 'block';
+        } else {
+          pricePreview.style.display = 'none';
+        }
+      } else {
+        pricePreview.style.display = 'none';
+      }
+    }
+
+    // Initial calculation if form has values
+    calculatePrice();
+  });
+</script>
+{% endblock %}

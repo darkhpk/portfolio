@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  {% if admin.id %}
+    <h2>Hello, {{ admin.username }}!</h2>
+  {% else %}
+    <h2>Hello, {{ account.fname }} {{ account.lname }}!</h2>
+  {% endif %}
+  <p>Welcome to your dashboard.</p>
+  
+  <div class="card">
+    <div class="card-header">
+      <a class="btn" data-bs-toggle="collapse" href="#hotelCollapse">
+        Hotel Bookings
+      </a>
+    </div>
+    <div id="hotelCollapse" class="collapse" data-bs-parent="#accordion">
+      <table class="card-body table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>Booking Nr</th>
+            <th>Date</th>
+            <th>Hotel Name</th>
+            <th>Location</th>
+            <th>Booking Date</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if room_booking %}
+            {% for hb in room_booking %}
+              <tr>
+                <td>{{ hb.booking_nr }}</td>
+                <td>{{ hb.date }}</td>
+                <td>{{ hb.name }}</td>
+                <td>{{ hb.location }}</td>
+                <td>{{ hb.checkin }} - {{ hb.checkout }}</td>
+                <td>{{ hb.price }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+              <tr>
+                <td>No booking found.</td>
+              </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <a class="btn" data-bs-toggle="collapse" href="#tripCollapse">
+        Trip Bookings
+      </a>
+    </div>
+    <div id="tripCollapse" class="collapse" data-bs-parent="#accordion">
+      <table class="card-body table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>Booking Nr</th>
+            <th>Date</th>
+            <th>Trip</th>
+            <th>Seats</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if trip_booking %}
+            {% for tb in trip_booking %}
+              <tr>
+                <td>{{ td.booking_nr }}</td>
+                <td>{{ tb.date }}</td>
+                <td>{{ tb.trip }}</td>
+                <td>{{ tb.seats}}</td>
+                <td>£££</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+              <tr>
+                <td>No booking found.</td>
+              </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <a class="btn" data-bs-toggle="collapse" href="#accountCollapse">
+        Account Bookings
+      </a>
+    </div>
+    <div id="accountCollapse" class="collapse" data-bs-parent="#accordion">
+      <div class="card-body">
+        <form method="post">
+          <label for="fname">First Name</label>
+          <input type="text" name="fname" value="{{ account.fname }}">
+          <label for="lname">Last Name</label>
+          <input type="text" name="lname" value="{{ account.lname }}">
+          <label for="dob">Date of Birth</label>
+          <input type="date" name="dob" value="{{ account.dateofbirth }}">
+          <label for="phone">Phone</label>
+          <input type="tel" name="phone" value="{{ account.phone }}">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
