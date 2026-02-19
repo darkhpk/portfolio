@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lobby - Online Classroom</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/lobby.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Online Classroom</h1>
+            <p>Collaborate in real-time on coding projects</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Create Room Section -->
+            <div class="card">
+                <h2>
+                    <span>➕</span>
+                    Create New Room
+                </h2>
+                <form method="post" action="{% url 'create_room' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="create-username">Your Name</label>
+                        <input type="text" id="create-username" name="username" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="room-name">Room Name</label>
+                        <input type="text" id="room-name" name="room_name" placeholder="e.g., Python Study Group" required>
+                    </div>
+                    <button type="submit" class="btn">Create Room</button>
+                </form>
+            </div>
+
+            <!-- Available Rooms Section -->
+            <div class="card">
+                <h2>
+                    <span>🚪</span>
+                    Available Rooms
+                    <span style="margin-left: auto; font-size: 14px; font-weight: normal; color: #858585;">
+                        {{ sessions.count }} active
+                    </span>
+                </h2>
+                <div class="room-list">
+                    {% if sessions %}
+                        {% for session in sessions %}
+                        <div class="room-item">
+                            <div class="room-info">
+                                <h3>{{ session.room_name|default:"Untitled Room" }}</h3>
+                                <div class="room-meta">
+                                    <span>
+                                        👥 {{ session.participant_count }} participant{{ session.participant_count|pluralize }}
+                                    </span>
+                                    <span>
+                                        <span class="badge">{{ session.language|upper }}</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <button class="join-btn" onclick="showJoinModal('{{ session.session_id }}', '{{ session.room_name|escapejs }}')">
+                                Join
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z"/>
+                            </svg>
+                            <p>No active rooms. Create one to get started!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join Room Modal -->
+    <div id="join-modal" class="modal">
+        <div class="modal-content">
+            <h3>Join Room</h3>
+            <form id="join-form" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="join-username">Your Name</label>
+                    <input type="text" id="join-username" name="username" placeholder="Enter your name" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="hideJoinModal()">Cancel</button>
+                    <button type="submit" class="btn">Join</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentSessionId = null;
+
+        function showJoinModal(sessionId, roomName) {
+            currentSessionId = sessionId;
+            document.getElementById('join-form').action = `/join-room/${sessionId}/`;
+            document.getElementById('join-modal').classList.add('active');
+            document.getElementById('join-username').focus();
+        }
+
+        function hideJoinModal() {
+            document.getElementById('join-modal').classList.remove('active');
+            currentSessionId = null;
+        }
+
+        // Close modal on background click
+        document.getElementById('join-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideJoinModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideJoinModal();
+            }
+        });
+
+        // Auto-refresh room list every 10 seconds
+        setInterval(function() {
+            location.reload();
+        }, 10000);
+    </script>
+</body>
+</html>

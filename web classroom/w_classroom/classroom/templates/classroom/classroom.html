@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Classroom - Collaborative Code Editor</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/classroom.css' %}">
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>🎓 {{ session.room_name|default:"Online Classroom" }}</h1>
+            <div class="session-info">{{ username }} • Session: {{ session_id|slice:":8" }}...</div>
+        </div>
+        <div class="header-right">
+            <div class="participants-dropdown">
+                <button class="participants-btn" id="participants-btn">
+                    👥 Participants
+                    <span class="participants-count" id="participants-count">1</span>
+                </button>
+                <div class="participants-list" id="participants-list">
+                    <div class="participants-list-header">Online Now</div>
+                    <div id="participants-container">
+                        <div class="participant-item">
+                            <span class="participant-status"></span>
+                            {{ username }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="close-room-btn" id="close-room-btn" style="display: none;">🚪 Close Room</button>
+            <a href="/" style="color: #858585; text-decoration: none; font-size: 13px;">← Back to Lobby</a>
+        </div>
+    </div>
+
+    <div class="controls">
+        <label for="language">Language:</label>
+        <select id="language" name="language">
+            <option value="python" {% if session.language == 'python' %}selected{% endif %}>Python</option>
+            <option value="javascript" {% if session.language == 'javascript' %}selected{% endif %}>JavaScript</option>
+            <option value="java" {% if session.language == 'java' %}selected{% endif %}>Java</option>
+            <option value="cpp" {% if session.language == 'cpp' %}selected{% endif %}>C++</option>
+            <option value="c" {% if session.language == 'c' %}selected{% endif %}>C</option>
+        </select>
+        <div class="indentation-info">
+            <label for="tab-size">Tab Size:</label>
+            <select id="tab-size" name="tab-size">
+                <option value="2">2 spaces</option>
+                <option value="4" selected>4 spaces</option>
+                <option value="8">8 spaces</option>
+            </select>
+        </div>
+        <div class="cursor-info" id="cursor-info">
+            <span id="cursor-position">Ln 1, Col 1</span>
+            <span id="indent-level" style="margin-left: 15px;">Indent: 0</span>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="panel">
+            <div class="panel-header">Code Editor</div>
+            <div class="panel-content">
+                <div class="editor-wrapper">
+                    <div class="line-numbers" id="line-numbers"><div>1</div></div>
+                    <textarea id="code-input" spellcheck="false">{{ session.code }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">Output</div>
+            <div class="panel-content">
+                <div id="output" class="output-content">{{ session.output|default:"Run your code to see output here..." }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="button-bar">
+        <button id="run-btn">▶ Run</button>
+        <button id="clear-btn" class="secondary">Clear Code</button>
+        <button id="clear-output-btn" class="secondary">Clear Output</button>
+        <button id="copy-btn" class="secondary">Copy Code</button>
+        <div class="status-indicator">
+            <span class="status-dot" id="status-dot"></span>
+            <span id="status-text">Connecting...</span>
+        </div>
+    </div>
+
+    <script>
+        const sessionId = '{{ session_id }}';
+        const currentUsername = '{{ username }}';
+        const codeInput = document.getElementById('code-input');
+        const lineNumbers = document.getElementById('line-numbers');
+        const languageSelect = document.getElementById('language');
+        const output = document.getElementById('output');
+        const runBtn = document.getElementById('run-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const clearOutputBtn = document.getElementById('clear-output-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        const participantsBtn = document.getElementById('participants-btn');
+        const participantsList = document.getElementById('participants-list');
+        const participantsCount = document.getElementById('participants-count');
+        const participantsContainer = document.getElementById('participants-container');
+        const closeRoomBtn = document.getElementById('close-room-btn');
+
+        let socket = null;
+        let isExecuting = false;
+        let isUpdatingFromRemote = false;
+        let currentOwner = null;
+        let mutedUsers = [];
+
+        // Update line numbers
+        function updateLineNumbers() {
+            const lines = codeInput.value.split('\n');
+            const lineCount = lines.length;
+            let html = '';
+            for (let i = 1; i <= lineCount; i++) {
+                html += `<div>${i}</div>`;
+            }
+            lineNumbers.innerHTML = html;
+        }
+
+        // Sync scroll between textarea and line numbers
+        codeInput.addEventListener('scroll', function() {
+            lineNumbers.scrollTop = codeInput.scrollTop;
+        });
+
+        // Update line numbers on input
+        codeInput.addEventListener('input', function() {
+            updateLineNumbers();
+            updateCursorInfo();
+        });
+
+        // Initialize line numbers
+        updateLineNumbers();
+
+        // Tab size control
+        const tabSizeSelect = document.getElementById('tab-size');
+        const cursorInfo = document.getElementById('cursor-info');
+        const cursorPosition = document.getElementById('cursor-position');
+        const indentLevel = document.getElementById('indent-level');
+        let tabSize = 4;
+
+        tabSizeSelect.addEventListener('change', function() {
+            tabSize = parseInt(this.value);
+        });
+
+        // Handle tab key
+        codeInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                const spaces = ' '.repeat(tabSize);
+
+                // Insert tab spaces
+                this.value = this.value.substring(0, start) + spaces + this.value.substring(end);
+                
+                // Move cursor
+                this.selectionStart = this.selectionEnd = start + tabSize;
+                
+                // Trigger input event to sync with others
+                updateLineNumbers();
+                updateCursorInfo();
+                
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'code_update',
+                        code: codeInput.value,
+                        language: languageSelect.value
+                    }));
+                }
+            }
+        });
+
+        // Update cursor position and indentation info
+        function updateCursorInfo() {
+            const pos = codeInput.selectionStart;
+            const textBeforeCursor = codeInput.value.substring(0, pos);
+            const lines = textBeforeCursor.split('\n');
+            const currentLine = lines.length;
+            const currentCol = lines[lines.length - 1].length + 1;
+            
+            // Calculate indentation of current line
+            const currentLineText = lines[lines.length - 1];
+            const indentMatch = currentLineText.match(/^(\s*)/);
+            const indentSpaces = indentMatch ? indentMatch[1].length : 0;
+            
+            cursorPosition.textContent = `Ln ${currentLine}, Col ${currentCol}`;
+            indentLevel.textContent = `Indent: ${indentSpaces} spaces`;
+        }
+
+        // Track cursor position on click and keyboard navigation
+        codeInput.addEventListener('click', updateCursorInfo);
+        codeInput.addEventListener('keyup', updateCursorInfo);
+        
+        // Initialize cursor info
+        updateCursorInfo();
+
+        // Toggle participants dropdown
+        participantsBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            participantsList.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!participantsList.contains(e.target) && e.target !== participantsBtn) {
+                participantsList.classList.remove('show');
+            }
+        });
+
+        // Update participants list
+        function updateParticipantsList(participants, owner) {
+            currentOwner = owner;
+            const participantCount = participants.length;
+            participantsCount.textContent = participantCount;
+            
+            // Show close room button only for owner
+            if (currentUsername === currentOwner) {
+                closeRoomBtn.style.display = 'block';
+            } else {
+                closeRoomBtn.style.display = 'none';
+            }
+            
+            participantsContainer.innerHTML = participants.map(name => {
+                const isOwner = name === currentOwner;
+                const isMuted = mutedUsers.includes(name);
+                const canManage = currentUsername === currentOwner && name !== currentUsername;
+                
+                let html = `
+                    <div class="participant-item">
+                        <span class="participant-status"></span>
+                        ${name} ${isOwner ? '👑' : ''}
+                        ${isMuted ? '<span style="color: #ff6b6b; font-size: 11px;">(muted)</span>' : ''}
+                `;
+                
+                if (canManage) {
+                    html += `
+                        <div class="participant-actions">
+                            ${isMuted ? 
+                                `<button onclick="unmuteUser('${name}')" title="Unmute">🔊</button>` :
+                                `<button onclick="muteUser('${name}')" title="Mute">🔇</button>`
+                            }
+                            <button onclick="kickUser('${name}')" title="Kick">👢</button>
+                            <button onclick="banUser('${name}')" title="Ban">🚫</button>
+                        </div>
+                    `;
+                }
+                
+                html += `</div>`;
+                return html;
+            }).join('');
+        }
+
+        // WebSocket connection
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/code/${sessionId}/`;
+            
+            socket = new WebSocket(wsUrl);
+
+            socket.onopen = function(e) {
+                console.log('WebSocket connected');
+                statusDot.className = 'status-dot connected';
+                statusText.textContent = 'Connected';
+            };
+
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'code_update') {
+                    if (!isUpdatingFromRemote) {
+                        isUpdatingFromRemote = true;
+                        codeInput.value = data.code;
+                        updateLineNumbers();
+                        isUpdatingFromRemote = false;
+                    }
+                } else if (data.type === 'language_update') {
+                    languageSelect.value = data.language;
+                } else if (data.type === 'output_update') {
+                    output.textContent = data.output;
+                    output.className = data.isError ? 'output-content error' : 'output-content';
+                } else if (data.type === 'participants_update') {
+                    updateParticipantsList(data.participants, data.owner);
+                } else if (data.type === 'kicked') {
+                    alert('You have been kicked from this room by the owner.');
+                    window.location.href = '/';
+                } else if (data.type === 'banned') {
+                    alert('You have been banned from this room.');
+                    window.location.href = '/';
+                } else if (data.type === 'room_closed') {
+                    alert('This room has been closed by the owner.');
+                    window.location.href = '/';
+                } else if (data.type === 'user_muted') {
+                    if (!mutedUsers.includes(data.username)) {
+                        mutedUsers.push(data.username);
+                    }
+                    // Disable input if current user is muted
+                    if (data.username === currentUsername) {
+                        codeInput.disabled = true;
+                        codeInput.placeholder = 'You have been muted by the room owner';
+                    }
+                } else if (data.type === 'user_unmuted') {
+                    mutedUsers = mutedUsers.filter(u => u !== data.username);
+                    // Re-enable input if current user is unmuted
+                    if (data.username === currentUsername) {
+                        codeInput.disabled = false;
+                        codeInput.placeholder = '';
+                    }
+                }
+            };
+
+            socket.onclose = function(event) {
+                console.log('WebSocket disconnected');
+                statusDot.className = 'status-dot disconnected';
+                statusText.textContent = 'Disconnected';
+                
+                // Attempt to reconnect after 3 seconds
+                setTimeout(connectWebSocket, 3000);
+            };
+
+            socket.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                statusDot.className = 'status-dot disconnected';
+                statusText.textContent = 'Connection Error';
+            };
+        }
+
+        // Send code update via WebSocket
+        let typingTimer;
+        const typingDelay = 500; // milliseconds
+
+        codeInput.addEventListener('input', function() {
+            if (isUpdatingFromRemote) return;
+            
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'code_update',
+                        code: codeInput.value,
+                        language: languageSelect.value
+                    }));
+                }
+            }, typingDelay);
+        });
+
+        languageSelect.addEventListener('change', function() {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    type: 'language_update',
+                    language: languageSelect.value
+                }));
+            }
+        });
+
+        // Run code
+        runBtn.addEventListener('click', async function() {
+            if (isExecuting) return;
+            
+            isExecuting = true;
+            runBtn.disabled = true;
+            runBtn.textContent = '⏳ Running...';
+            output.textContent = 'Executing code...';
+            output.className = 'output-content';
+
+            try {
+                const response = await fetch('/api/execute/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        code: codeInput.value,
+                        language: languageSelect.value
+                    })
+                });
+
+                const result = await response.json();
+                const outputText = result.output || 'No output';
+                const isError = !result.success || outputText.includes('Error:');
+                
+                output.textContent = outputText;
+                output.className = isError ? 'output-content error' : 'output-content';
+
+                // Broadcast output to other users
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'output_update',
+                        output: outputText,
+                        isError: isError
+                    }));
+                }
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+                output.className = 'output-content error';
+            } finally {
+                isExecuting = false;
+                runBtn.disabled = false;
+                runBtn.textContent = '▶ Run';
+            }
+        });
+
+        // Clear code
+        clearBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear the code?')) {
+                codeInput.value = '';
+                
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'code_update',
+                        code: '',
+                        language: languageSelect.value
+                    }));
+                }
+            }
+        });
+
+        // Clear output
+        clearOutputBtn.addEventListener('click', function() {
+            output.textContent = 'Run your code to see output here...';
+            output.className = 'output-content';
+            
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    type: 'output_update',
+                    output: 'Run your code to see output here...',
+                    isError: false
+                }));
+            }
+        });
+
+        // Copy code
+        copyBtn.addEventListener('click', async function() {
+            try {
+                await navigator.clipboard.writeText(codeInput.value);
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            } catch (error) {
+                alert('Failed to copy code');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + Enter to run code
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                runBtn.click();
+            }
+        });
+
+        // Room management functions
+        function kickUser(username) {
+            if (confirm(`Kick ${username} from the room?`)) {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'kick_user',
+                        target_user: username
+                    }));
+                }
+            }
+        }
+
+        function muteUser(username) {
+            if (confirm(`Mute ${username}? They won't be able to edit code.`)) {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'mute_user',
+                        target_user: username
+                    }));
+                }
+            }
+        }
+
+        function unmuteUser(username) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    type: 'unmute_user',
+                    target_user: username
+                }));
+            }
+        }
+
+        function banUser(username) {
+            if (confirm(`Ban ${username}? They won't be able to reconnect to this room.`)) {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'ban_user',
+                        target_user: username
+                    }));
+                }
+            }
+        }
+
+        // Close room button
+        closeRoomBtn.addEventListener('click', function() {
+            if (confirm('Close this room? All participants will be redirected to the lobby.')) {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'close_room'
+                    }));
+                }
+                // Redirect owner to lobby after a short delay
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 500);
+            }
+        });
+
+        // Initialize WebSocket connection
+        connectWebSocket();
+    </script>
+</body>
+</html>
