@@ -707,7 +707,7 @@ car_reg = models.CharField(max_length=10, unique=True)
 - ✅ Form validation prevents script injection
 
 ### CSRF Protection
-- ✅ All forms include `{% csrf_token %}`
+- ✅ All forms include Django `csrf_token` template tag
 - ✅ POST requests protected
 
 ---
