@@ -30,9 +30,6 @@ A rudimentar copy of Monopoly with the basic movement and functions
 ### 🔒 [Cyber Security Scripts](https://github.com/darkhpk/portfolio/tree/42f7744b8424becfb1ff42fab8918b27ed10a17f/cyber%20security)
 A couple of scripts and programs that help in gathering information about the system to help in Cyber Security!
 
-### 📈 [Data Analysis](https://github.com/darkhpk/portfolio/tree/42f7744b8424becfb1ff42fab8918b27ed10a17f/data%20analysis)
-A jupyter notebook program that shows some exercises for data analysis
-
 ### 🧩 [Spell Game](https://github.com/darkhpk/portfolio/tree/42f7744b8424becfb1ff42fab8918b27ed10a17f/Spell%20Game)
 A GUI Game in Python that will display an image and you have to insert the correct name!
 
