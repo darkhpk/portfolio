@@ -8,14 +8,19 @@ Welcome to my GitHub portfolio! I'm passionate about technology and always eager
 - 🏦 Interested in creating a **Game**
 
 ## 🛠️ Technical Skills
-- **Languages:** Python, C++, C#, Dart, HTML/CSS/PHP, BootStrap/JQuery
-- **Frameworks & Tools:** Django, PyQt6, Flutter
+- **Languages:** Python, C++, C#, Dart, HTML/CSS/JavaScript, PHP, SQL, BootStrap/JQuery
+- **Frameworks & Tools:** Django, Flask, FastAPI, React, PyQt6, Flutter, SQLAlchemy
+- **Data Science & ML:** pandas, NumPy, scikit-learn, matplotlib, seaborn, Jupyter
+- **DevOps & Cloud:** Docker, SSH automation, Server monitoring, Backup management
+- **Databases:** SQLite, PostgreSQL, MySQL
 - **Specialized Areas:**
-  - Data Science (LSTM for stock prediction)
-  - Cybersecurity
-  - Web Development
+  - Data Science & Machine Learning (LSTM for stock prediction, Classification models)
+  - Cybersecurity & Penetration Testing
+  - Full-Stack Web Development
+  - RESTful API Design
+  - DevOps Automation
   - GUI Design
-- **Currently Learning:** Advanced AI in games, finance-related app development
+- **Currently Learning:** Advanced AI in games, finance-related app development, Cloud technologies
 
 ## 🌟 Featured Projects
 
@@ -45,6 +50,21 @@ A Python tool that clones entire webpages by downloading HTML content and all as
 
 ### 📊 [Load File Generator](https://github.com/darkhpk/portfolio/tree/42f7744b8424becfb1ff42fab8918b27ed10a17f/LoadFileGenerator)
 A high-performance C++ application with Qt6 GUI for generating DAT and OPT load files from PDF documents with metadata. Features multi-threaded PDF processing, volume management, and Bates numbering for document management systems.
+
+### 📊 [Sales Analytics Dashboard](./sales-analytics-dashboard)
+A comprehensive data analytics project that analyzes sales data and creates interactive visualizations using Python, pandas, matplotlib, and seaborn. Features statistical insights, trend analysis, customer segmentation, and automated reporting with beautiful charts.
+
+### 🤖 [Weather Prediction ML Model](./weather-prediction-ml)
+A machine learning project that predicts weather conditions using historical data. Built with scikit-learn, featuring multiple ML models (Random Forest, Logistic Regression, SVM, Gradient Boosting), comprehensive evaluation metrics, and feature importance analysis with ~85% accuracy.
+
+### 🔗 [Task Management API](./task-management-api)
+A RESTful API built with FastAPI for managing tasks, projects, and user collaboration. Features JWT authentication, PostgreSQL database, SQLAlchemy ORM, auto-generated Swagger/OpenAPI documentation, and comprehensive CRUD operations with full error handling.
+
+### 💰 [Personal Finance Tracker](./personal-finance-tracker)
+A full-stack web application for tracking personal finances with React frontend and Flask backend. Features expense tracking, income management, budget planning, visual reports with interactive charts, and comprehensive financial insights dashboard.
+
+### ⚙️ [DevOps Automation Suite](./devops-automation-suite)
+A comprehensive collection of automation scripts for DevOps tasks including deployment automation, server monitoring with alerts, backup management, log analysis, and Docker utilities. Features SSH-based remote operations and email notifications.
 
 ## 📚 Additional Projects
 - **Calculator** - A PyQt6 GUI calculator application supporting basic arithmetic operations with a clean, user-friendly interface

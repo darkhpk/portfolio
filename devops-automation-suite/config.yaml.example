@@ -1,0 +1,47 @@
+# Example configuration file for DevOps Automation Suite
+
+servers:
+  - name: production-web
+    environment: production
+    host: production.example.com
+    user: deploy
+    port: 22
+    key_path: ~/.ssh/id_rsa
+    app_path: /var/www/app
+    services:
+      - nginx
+      - gunicorn
+    run_migrations: true
+    health_url: https://production.example.com/health
+
+  - name: staging-web
+    environment: staging
+    host: staging.example.com
+    user: deploy
+    port: 22
+    key_path: ~/.ssh/id_rsa
+    app_path: /var/www/app
+    services:
+      - nginx
+      - gunicorn
+
+monitoring:
+  check_interval: 300  # seconds
+  alert_threshold: 80  # percentage
+
+backup:
+  destination: /backups
+  retention_days: 30
+  sources:
+    - /var/www/app
+    - /etc/nginx
+    - /home/deploy/.env
+
+email:
+  enabled: false
+  smtp_server: smtp.gmail.com
+  smtp_port: 587
+  from_address: alerts@example.com
+  to_address: admin@example.com
+  username: your-email@gmail.com
+  password: your-app-password
