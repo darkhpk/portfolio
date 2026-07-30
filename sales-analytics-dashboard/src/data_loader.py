@@ -4,6 +4,7 @@ Data loading and preprocessing module
 
 import pandas as pd
 import numpy as np
+import os
 from datetime import datetime, timedelta
 
 
@@ -22,6 +23,9 @@ def load_and_preprocess_data(filepath):
     except FileNotFoundError:
         print(f"File not found. Generating sample data...")
         df = generate_sample_data()
+        directory = os.path.dirname(filepath)
+        if directory:
+            os.makedirs(directory, exist_ok=True)
         df.to_csv(filepath, index=False)
         print(f"Sample data saved to {filepath}")
     

@@ -54,19 +54,19 @@ def main():
     print("\n3. Generating visualizations...")
     
     visualizer.plot_sales_trend()
-    print("   ✓ Sales trend chart saved")
+    print("Sales trend chart saved")
     
     visualizer.plot_product_performance()
-    print("   ✓ Product performance chart saved")
+    print("Product performance chart saved")
     
     visualizer.plot_regional_distribution()
-    print("   ✓ Regional distribution chart saved")
+    print("Regional distribution chart saved")
     
     visualizer.plot_customer_segments()
-    print("   ✓ Customer segmentation chart saved")
+    print("Customer segmentation chart saved")
     
     visualizer.create_dashboard()
-    print("   ✓ Complete dashboard saved")
+    print("Complete dashboard saved")
     
     print("\n" + "=" * 60)
     print("Analysis complete! Check the 'reports' folder for outputs.")
